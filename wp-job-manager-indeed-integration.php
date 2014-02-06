@@ -48,7 +48,7 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 		add_shortcode( 'indeed_jobs', array( $this, 'output_indeed_jobs' ) );
 
 		// Init updates
-		$this->init_updates( __FILE__ );
+		$this->init_updates( __FILE__, true );
 	}
 
 	/**
