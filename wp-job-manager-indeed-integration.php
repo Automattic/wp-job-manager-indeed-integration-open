@@ -3,7 +3,7 @@
 Plugin Name: WP Job Manager - Indeed Integration
 Plugin URI: http://mikejolley.com
 Description: Query and show sponsored results from Indeed when listing jobs, or list only Indeed jobs via a shortcode. Note: Jobs will be displayed in list format linking offsite (without detailed views/descriptions). Uses https://ads.indeed.com/jobroll/xmlfeed
-Version: 1.0.0
+Version: 1.0.1
 Author: Mike Jolley
 Author URI: http://mikejolley.com
 Requires at least: 3.5
@@ -31,7 +31,7 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '1.0.0' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '1.0.1' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
@@ -256,7 +256,7 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 				case 'part-time' :
 					$type = 'parttime';
 				break;
-				case 'intership' :
+				case 'internship' :
 				case 'temporary' :
 				break;
 				case 'freelance' :
