@@ -2,10 +2,12 @@
 Contributors: mikejolley
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.0.1
+Stable tag: 2.0.0
 License: GNU General Public License v3.0
 
-Query and show sponsored results from Indeed when listing jobs, or list only Indeed jobs via a shortcode. Note: Jobs will be displayed in list format linking offsite (without detailed views/descriptions). Uses https://ads.indeed.com/jobroll/xmlfeed
+Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
+
+Uses https://ads.indeed.com/jobroll/xmlfeed and http://www.indeed.com/intl/en/xmlinfo.html
 
 = Documentation =
 
@@ -26,6 +28,10 @@ If you need help with customisation you will need to find and hire a developer c
 To install this plugin, please refer to the guide here: [http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation)
 
 == Changelog ==
+
+= 2.0.0 =
+* Added Indeed XML Feed functionality to export your listings to Indeed. http://www.indeed.com/intl/en/xmlinfo.html
+* Added pagination for both indeed shortcodes and when displaying backfilled jobs
 
 = 1.0.1 =
 * Internship typo

@@ -2,8 +2,8 @@
 /*
 Plugin Name: WP Job Manager - Indeed Integration
 Plugin URI: http://mikejolley.com
-Description: Query and show sponsored results from Indeed when listing jobs, or list only Indeed jobs via a shortcode. Note: Jobs will be displayed in list format linking offsite (without detailed views/descriptions). Uses https://ads.indeed.com/jobroll/xmlfeed
-Version: 1.0.1
+Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
+Version: 2.0.0
 Author: Mike Jolley
 Author URI: http://mikejolley.com
 Requires at least: 3.5
@@ -31,21 +31,27 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '1.0.1' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '2.0.0' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
-		// Includes
-		include_once( 'includes/class-wp-job-manager-indeed-api.php' );
-
 		// Add actions
-		add_action( 'init', array( $this, 'init' ), 12 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
+		add_action( 'init', array( $this, 'load_plugin_textdomain' ), 12 );
 		add_filter( 'job_manager_settings', array( $this, 'settings' ) );
-		add_filter( 'job_manager_get_listings_result', array( $this, 'job_manager_get_listings_result' ) );
+		add_action( 'admin_footer-job_listing_page_job-manager-settings', array( $this, 'settings_js' ) );
 
-		// Add shortcodes
-		add_shortcode( 'indeed_jobs', array( $this, 'output_indeed_jobs' ) );
+		// Includes
+		if ( get_option( 'job_manager_indeed_enable_backfill', 1 ) == 1 ) {
+			include_once( 'includes/class-wp-job-manager-indeed-import.php' );
+		}
+
+		if ( get_option( 'job_manager_indeed_enable_feed', 1 ) == 1 ) {
+			include_once( 'includes/class-wp-job-manager-indeed-export.php' );
+		}
+
+		// Install
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
 
 		// Init updates
 		$this->init_updates( __FILE__, true );
@@ -54,16 +60,8 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 	/**
 	 * Localisation
 	 */
-	public function init() {
+	public function load_plugin_textdomain() {
 		load_plugin_textdomain( 'job_manager_indeed', false, dirname( plugin_basename( __FILE__ ) ) );
-	}
-
-	/**
-	 * Enqueue scripts
-	 */
-	public function scripts() {
-		wp_enqueue_style( 'job-manager-indeed', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/css/frontend.css' );
-		wp_enqueue_script( 'indeed-click-tracking', '//gdc.indeed.com/ads/apiresults.js', array(), '1.0' );
 	}
 
 	/**
@@ -83,6 +81,24 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 						'label' 	=> __( 'Publisher ID', 'job_manager_indeed' ),
 						'desc'		=> __( 'To show search results from Indeed you will need a publisher account. Obtain this here: https://ads.indeed.com/jobroll/signup', 'job_manager_indeed' ),
 						'type'      => 'input'
+					),
+
+					array(
+						'name' 		=> 'job_manager_indeed_enable_feed',
+						'std' 		=> 1,
+						'label' 	=> __( 'Enable XML Feed', 'job_manager_indeed' ),
+						'cb_label' 	=> __( 'Enable Indeed XML feed.', 'job_manager_indeed' ),
+						'desc'		=> sprintf( __( 'The generated feed can be used to submit jobs to Indeed (see <a href="http://www.indeed.com/intl/en/xmlinfo.html">here</a>). Your feed will be found at: %s', 'job_manager_indeed' ), '<a href="' . home_url( '/indeed-job-feed/' ) . '">' . home_url( '/indeed-job-feed/' ) . '</a>' ),
+						'type'      => 'checkbox'
+					),
+
+					array(
+						'name' 		=> 'job_manager_indeed_enable_backfill',
+						'std' 		=> 1,
+						'label' 	=> __( 'Enable Backfill', 'job_manager_indeed' ),
+						'cb_label' 	=> __( 'Enable backfilling jobs from Indeed', 'job_manager_indeed' ),
+						'desc'		=> __( 'Enabling this allows you to show sponsored job listings from Indeed within your own job lists.', 'job_manager_indeed' ),
+						'type'      => 'checkbox'
 					),
 
 					array(
@@ -177,188 +193,25 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 	}
 
 	/**
-	 * Get the type we are querying
-	 * @return string
+	 * Some JS for the settings screen
 	 */
-	public function get_mapped_job_type( $type ) {
-		if ( ! $type ) {
-			$type = get_option( 'job_manager_indeed_default_type' );
-		}
-		switch ( $type ) {
-			case 'fulltime' :
-				$type = 'full-time';
-			break;
-			case 'parttime' :
-				$type = 'part-time';
-			break;
-			case 'contract' :
-				$type = 'freelance';
-			break;
-		}
-		return $type;
+	public function settings_js() {
+		?>
+		<script type="text/javascript">
+			jQuery('input#setting-job_manager_indeed_enable_backfill').change(function() {
+
+				var $options = jQuery('#setting-job_manager_indeed_site_type, #setting-job_manager_indeed_default_query, #setting-job_manager_indeed_default_location, #setting-job_manager_indeed_default_type, #setting-job_manager_indeed_default_country, #setting-job_manager_indeed_backfill, #setting-job_manager_indeed_before_jobs, #setting-job_manager_indeed_after_jobs, #setting-job_manager_indeed_per_page, #setting-job_manager_indeed_show_attribution');
+
+				if ( jQuery(this).is(':checked') ) {
+					$options.closest('tr').show();
+				} else {
+					$options.closest('tr').hide();
+				}
+
+			}).change();
+		</script>
+		<?php
 	}
-
-	/**
-	 * When getting results via ajax, show indeed listings
-	 * @param  array $result
-	 * @return array
-	 */
-	public function job_manager_get_listings_result( $result ) {
-		global $indeed_job, $indeed_query_count;
-
-		ob_start();
-
-		$types            = get_job_listing_types();
-		$filter_job_types = isset( $_POST['filter_job_type'] ) ? array_filter( array_map( 'sanitize_title', (array) $_POST['filter_job_type'] ) ) : null;
-		$search_location  = sanitize_text_field( stripslashes( $_POST['search_location'] ) );
-		$search_keywords  = sanitize_text_field( stripslashes( $_POST['search_keywords'] ) );
-		$return_jobs      = false;
-		$insert_jobs      = 'before';
-		$job_start        = 0;
-
-		// If local jobs were found
-		if ( $result['found_jobs'] ) {
-
-			$page = isset( $_POST['page'] ) ? $_POST['page'] : 1;
-
-			if ( $page == 1 && get_option( 'job_manager_indeed_before_jobs' ) ) {
-
-				$return_jobs = get_option( 'job_manager_indeed_before_jobs' );
-
-			} elseif ( $page == $result['max_num_pages'] && get_option( 'job_manager_indeed_after_jobs' ) ) {
-
-				$insert_jobs = 'after';
-				$job_start   = get_option( 'job_manager_indeed_before_jobs' ) + ( get_option( 'job_manager_indeed_per_page' ) * $page );
-				$return_jobs = get_option( 'job_manager_indeed_after_jobs' );
-
-			} elseif ( $page > 1 && $page != $result['max_num_pages'] && get_option( 'job_manager_indeed_per_page' ) ) {
-
-				$job_start   = get_option( 'job_manager_indeed_before_jobs' ) + ( get_option( 'job_manager_indeed_per_page' ) * $page );
-				$return_jobs = get_option( 'job_manager_indeed_per_page' );
-
-			}
-
-		// No jobs were found
-		} elseif ( get_option( 'job_manager_indeed_backfill' ) ) {
-			$return_jobs = get_option( 'job_manager_indeed_backfill' );
-		}
-
-		if ( ! $return_jobs ) {
-			return $result;
-		}
-
-		if ( sizeof( $filter_job_types ) !== sizeof( $types ) ) {
-			$type = $filter_job_types[ 0 ];
-			switch ( $type ) {
-				case 'full-time' :
-					$type = 'fulltime';
-				break;
-				case 'part-time' :
-					$type = 'parttime';
-				break;
-				case 'internship' :
-				case 'temporary' :
-				break;
-				case 'freelance' :
-					$type = 'contract';
-				break;
-				default :
-					$type = get_option( 'job_manager_indeed_default_type' );
-				break;
-			}
-		} else {
-			$type = get_option( 'job_manager_indeed_default_type' );
-		}
-
-		$api_args = array(
-			'limit' => $return_jobs,
-			'sort'  => $search_location || $search_keywords ? 'relevance' : 'date',
-			'q'     => $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_query' ),
-			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
-			'jt'    => $type,
-			'start' => $job_start
-		);
-		$api      = new WP_Job_Manager_Indeed_API();
-		$jobs     = $api->get_jobs( $api_args );
-
-		if ( $jobs ) {
-
-			if ( get_option( 'job_manager_indeed_show_attribution' ) ) {
-				get_job_manager_template_part( 'content', 'indeed-attribution', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
-			}
-
-			foreach ( $jobs as $indeed_job ) {
-				$indeed_job           = (object) $indeed_job;
-				$indeed_job->job_type = $this->get_mapped_job_type( $type );
-
-				$term = get_term_by( 'slug', $indeed_job->job_type, 'job_listing_type' );
-				if ( $term && ! is_wp_error( $term ) ) {
-					$indeed_job->job_type_name = $term->name;
-				} else {
-					$indeed_job->job_type_name = $indeed_job->job_type;
-				}
-
-				get_job_manager_template_part( 'content', 'indeed-job-listing', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
-			}
-
-			if ( $result['found_jobs'] ) {
-				if ( $insert_jobs == 'before' ) {
-					$result['html'] = ob_get_clean() . $result['html'];
-				} else {
-					$result['html'] .= ob_get_clean();
-				}
-			} else {
-				$result['html'] = ob_get_clean();
-			}
-		}
-		return $result;
-	}
-
-	/**
-	 * Indeed jobs shortcode
-	 *
-	 * @param mixed $atts
-	 */
-	public function output_indeed_jobs( $atts ) {
-		global $indeed_job;
-		ob_start();
-
-		$api_args = shortcode_atts( apply_filters( 'job_manager_output_indeed_jobs_defaults', array(
-			'limit'  => 10, // Limit results
-			'sort'   => 'date', // relevance or date
-			'q'      => get_option( 'job_manager_indeed_default_query' ), // Keywords
-			'l'      => get_option( 'job_manager_indeed_default_location' ), // Location
-			'jt'     => get_option( 'job_manager_indeed_default_type' ), // type
-			'start'  => 0, // Offset
-			'radius' => 25,
-		) ), $atts );
-
-		$api      = new WP_Job_Manager_Indeed_API();
-		$jobs     = $api->get_jobs( $api_args );
-
-		if ( $jobs ) {
-			echo '<ul class="job_listings">';
-			foreach ( $jobs as $indeed_job ) {
-				$indeed_job           = (object) $indeed_job;
-				$indeed_job->job_type = $this->get_mapped_job_type( $api_args['jt'] );
-
-				$term = get_term_by( 'slug', $indeed_job->job_type, 'job_listing_type' );
-				if ( $term && ! is_wp_error( $term ) ) {
-					$indeed_job->job_type_name = $term->name;
-				} else {
-					$indeed_job->job_type_name = $indeed_job->job_type;
-				}
-
-				get_job_manager_template_part( 'content', 'indeed-job-listing', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
-			}
-			if ( get_option( 'job_manager_indeed_show_attribution' ) ) {
-				get_job_manager_template_part( 'content', 'indeed-attribution', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
-			}
-			echo '</ul>';
-		}
-
-		return '<div class="indeed_job_listings job_listings">' . ob_get_clean() . '</div>';
-	}	
 }
 
 $GLOBALS['job_manager_indeed'] = new WP_Job_Manager_Indeed_Integration();

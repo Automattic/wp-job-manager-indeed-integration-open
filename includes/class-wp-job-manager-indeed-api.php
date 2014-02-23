@@ -16,6 +16,7 @@ class WP_Job_Manager_Indeed_API {
 		'start'     => 0,
 		'limit'     => 10
 	);
+	public $total_results = 0;
 
 	/**
 	 * Constructor
@@ -66,7 +67,6 @@ class WP_Job_Manager_Indeed_API {
 			
 			if ( ! is_wp_error( $result ) && ! empty( $result['body'] ) ) {
 				$results = (array) json_decode( $result['body'] );
-				$results = $results['results'];
 			}
 
 			// Cache for 1 day
@@ -74,6 +74,11 @@ class WP_Job_Manager_Indeed_API {
 				set_transient( $transient_name, $results, ( 60 * 60 * 24 ) );
 			}
 		}
-		return $results;
+
+		if ( isset( $results['totalResults'] ) ) {
+			$this->total_results = absint( $results['totalResults'] );
+		}
+
+		return isset( $results['results'] ) ? $results['results'] : $results;
 	}
 }
