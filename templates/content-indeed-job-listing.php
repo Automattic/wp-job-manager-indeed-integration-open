@@ -1,6 +1,6 @@
 <?php global $indeed_job; ?>
-<li class="indeed_job_listing job_listing">
-	<a href="<?php echo $indeed_job->url; ?>" onmousedown="<?php echo $indeed_job->onmousedown; ?>">
+<li class="indeed_job_listing job_listing" data-longitude="<?php echo esc_attr( $indeed_job->longitude ); ?>" data-latitude="<?php echo esc_attr( $indeed_job->latitude ); ?>">
+	<a href="<?php echo $indeed_job->url; ?>" target="_blank" onmousedown="<?php echo $indeed_job->onmousedown; ?>">
 		<?php echo '<img class="company_logo" src="' . JOB_MANAGER_PLUGIN_URL . '/assets/images/company.png' . '" alt="Logo" />'; ?>
 		<div class="position">
 			<h3><?php echo $indeed_job->jobtitle; ?></h3>

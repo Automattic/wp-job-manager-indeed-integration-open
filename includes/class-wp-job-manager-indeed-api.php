@@ -28,6 +28,7 @@ class WP_Job_Manager_Indeed_API {
 		$this->default_args['jt']        = get_option( 'job_manager_indeed_default_type' );
 		$this->default_args['st']        = get_option( 'job_manager_indeed_site_type' );
 		$this->default_args['co']        = get_option( 'job_manager_indeed_default_country' );
+		$this->default_args['latlong']   = 1;
 	}
 
 	/**
