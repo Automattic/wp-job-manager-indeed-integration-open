@@ -135,11 +135,22 @@ class WP_Job_Manager_Indeed_Import {
 			$type = get_option( 'job_manager_indeed_default_type' );
 		}
 
+		// Before querying indeed, lets ensure the CO variable matches the location by using google geocoding
+		$search_country = get_option( 'job_manager_indeed_default_country' );
+
+		if ( $search_location ) {
+			$address_data = WP_Job_Manager_Geocode::get_location_data( $search_location );
+			if ( ! empty( $address_data['country_short'] ) ) {
+				$search_country = $address_data['country_short'];
+			}
+		} 
+		
 		$api_args = array(
 			'limit' => $return_jobs,
 			'sort'  => 'date',
 			'q'     => $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_query' ),
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
+			'co'    => $search_country,
 			'jt'    => $type,
 			'start' => $job_start
 		);
