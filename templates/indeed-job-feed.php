@@ -108,6 +108,12 @@ while ( $query->have_posts() ) : $query->the_post();
 	$get_country = substr( get_post_meta( get_the_ID(), 'geolocation_country_short', true ), -2);
 	$country->appendChild($xml_document->createCDATASection( strtolower( $get_country ) ));
 	$job_element->appendChild($country);
+
+	// Categories
+	$category = $xml_document->createElement("category");
+	$categories = wp_get_post_terms( get_the_ID(), 'job_listing_category', array( "fields" => "names" ) );
+	$category->appendChild( $xml_document->createCDATASection( implode( ',', $categories ) ) );
+	$job_element->appendChild( $category );
 	
 	// End Job Element
 	$root->appendChild( $job_element );

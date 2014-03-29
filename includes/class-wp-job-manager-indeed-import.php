@@ -147,7 +147,7 @@ class WP_Job_Manager_Indeed_Import {
 		
 		$api_args = array(
 			'limit' => $return_jobs,
-			'sort'  => 'date',
+			'sort'  => 'relevance',
 			'q'     => $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_query' ),
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
@@ -263,7 +263,7 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args['limit']  = absint( isset( $api_args['limit'] ) ? $api_args['limit'] : 10 );
 		$api_args['start']  = absint( isset( $api_args['start'] ) ? $api_args['start'] : 0 );
 		$api_args['radius'] = absint( isset( $api_args['radius'] ) ? $api_args['radius'] : 25 );
-		$api_args['sort']   = sanitize_text_field( isset( $api_args['sort'] ) ? $api_args['sort'] : 'date' );
+		$api_args['sort']   = sanitize_text_field( isset( $api_args['sort'] ) ? $api_args['sort'] : 'relevance' );
 		$api_args['q']      = sanitize_text_field( isset( $api_args['q'] ) ? $api_args['q'] : '' );
 		$api_args['l']      = sanitize_text_field( isset( $api_args['l'] ) ? $api_args['l'] : '' );
 		$api_args['jt']     = sanitize_text_field( isset( $api_args['jt'] ) ? $api_args['jt'] : '' );
