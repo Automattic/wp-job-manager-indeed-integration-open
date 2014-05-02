@@ -17,6 +17,13 @@ class WPJM_Updater {
 	private $plugin_data;
 
 	/**
+	 * Constructor, used if called directly.
+	 */
+	public function __construct( $file ) {
+		$this->init_updates( $file );
+	}
+
+	/**
 	 * Init the updater
 	 */
 	public function init_updates( $file ) {
