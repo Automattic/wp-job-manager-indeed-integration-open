@@ -1,13 +1,13 @@
 <?php
 /*
 Plugin Name: WP Job Manager - Indeed Integration
-Plugin URI: http://mikejolley.com
+Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
 Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
-Version: 2.0.4
+Version: 2.0.5
 Author: Mike Jolley
 Author URI: http://mikejolley.com
-Requires at least: 3.5
-Tested up to: 3.8
+Requires at least: 3.8
+Tested up to: 3.9
 
 	Copyright: 2013 Mike Jolley
 	License: GNU General Public License v3.0
@@ -15,23 +15,25 @@ Tested up to: 3.8
 */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) )
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
 
-if ( ! class_exists( 'MJ_Updater' ) )
-	include( 'includes/updater/class-mj-updater.php' );
+if ( ! class_exists( 'WPJM_Updater' ) ) {
+	include( 'includes/updater/class-wpjm-updater.php' );
+}
 
 /**
  * WP_Job_Manager_Indeed_Integration class.
  */
-class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
+class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 
 	/**
 	 * __construct function.
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '2.0.4' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '2.0.5' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
@@ -49,12 +51,19 @@ class WP_Job_Manager_Indeed_Integration extends MJ_Updater {
 			include_once( 'includes/class-wp-job-manager-indeed-export.php' );
 		}
 
-		// Install
+		// Install and uninstall
 		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
 		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
 
 		// Init updates
-		$this->init_updates( __FILE__, true );
+		$this->init_updates( __FILE__ );
+	}
+
+	/**
+	 * Runs on de-activation
+	 */
+	public function deactivate() {
+
 	}
 
 	/**

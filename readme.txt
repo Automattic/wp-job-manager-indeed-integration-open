@@ -1,8 +1,8 @@
 === Indeed Integration ===
 Contributors: mikejolley
-Requires at least: 3.5
-Tested up to: 3.8
-Stable tag: 2.0.4
+Requires at least: 3.8
+Tested up to: 3.9
+Stable tag: 2.0.5
 License: GNU General Public License v3.0
 
 Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
@@ -28,6 +28,10 @@ If you need help with customisation you will need to find and hire a developer c
 To install this plugin, please refer to the guide here: [http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation)
 
 == Changelog ==
+
+= 2.0.5 =
+* Search title only when quering indeed. More relevance.
+* Added new updater - This requires a licence key which should be emailed to you after purchase. Past customers (via Gumroad) will also be emailed a key - if you don't recieve one, email me.
 
 = 2.0.4 =
 * Add category to feeds
