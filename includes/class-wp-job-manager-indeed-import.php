@@ -214,6 +214,7 @@ class WP_Job_Manager_Indeed_Import {
 			'jt'     => get_option( 'job_manager_indeed_default_type' ), // type
 			'start'  => 0, // Offset
 			'radius' => 25,
+			'co'     => get_option( 'job_manager_indeed_default_country' )
 		) ), $atts );
 
 		$api      = new WP_Job_Manager_Indeed_API();
