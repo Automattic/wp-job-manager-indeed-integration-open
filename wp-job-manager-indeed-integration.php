@@ -68,7 +68,7 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 	 * Localisation
 	 */
 	public function load_plugin_textdomain() {
-		load_plugin_textdomain( 'job_manager_indeed', false, dirname( plugin_basename( __FILE__ ) ) );
+		load_plugin_textdomain( 'wp-job-manager-indeed-integration', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 	/**
@@ -78,33 +78,33 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 	 */
 	public function settings( $settings = array() ) {
 		$settings['indeed_integration'] = array(
-			__( 'Indeed Integration', 'job_manager_indeed' ),
+			__( 'Indeed Integration', 'wp-job-manager-indeed-integration' ),
 			apply_filters(
 				'wp_job_manager_indeed_integration_settings',
 				array(
 					array(
 						'name' 		=> 'job_manager_indeed_publisher_id',
 						'std' 		=> '',
-						'label' 	=> __( 'Publisher ID', 'job_manager_indeed' ),
-						'desc'		=> __( 'To show search results from Indeed you will need a publisher account. Obtain this here: https://ads.indeed.com/jobroll/signup', 'job_manager_indeed' ),
+						'label' 	=> __( 'Publisher ID', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'To show search results from Indeed you will need a publisher account. Obtain this here: https://ads.indeed.com/jobroll/signup', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 
 					array(
 						'name' 		=> 'job_manager_indeed_enable_feed',
 						'std' 		=> 1,
-						'label' 	=> __( 'Enable XML Feed', 'job_manager_indeed' ),
-						'cb_label' 	=> __( 'Enable Indeed XML feed.', 'job_manager_indeed' ),
-						'desc'		=> sprintf( __( 'The generated feed can be used to submit jobs to Indeed (see <a href="http://www.indeed.com/intl/en/xmlinfo.html">here</a>). Your feed will be found at: %s', 'job_manager_indeed' ), '<a href="' . home_url( '/indeed-job-feed/' ) . '">' . home_url( '/indeed-job-feed/' ) . '</a>' ),
+						'label' 	=> __( 'Enable XML Feed', 'wp-job-manager-indeed-integration' ),
+						'cb_label' 	=> __( 'Enable Indeed XML feed.', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> sprintf( __( 'The generated feed can be used to submit jobs to Indeed (see <a href="http://www.indeed.com/intl/en/xmlinfo.html">here</a>). Your feed will be found at: %s', 'wp-job-manager-indeed-integration' ), '<a href="' . home_url( '/indeed-job-feed/' ) . '">' . home_url( '/indeed-job-feed/' ) . '</a>' ),
 						'type'      => 'checkbox'
 					),
 
 					array(
 						'name' 		=> 'job_manager_indeed_enable_backfill',
 						'std' 		=> 1,
-						'label' 	=> __( 'Enable Backfill', 'job_manager_indeed' ),
-						'cb_label' 	=> __( 'Enable backfilling jobs from Indeed', 'job_manager_indeed' ),
-						'desc'		=> __( 'Enabling this allows you to show sponsored job listings from Indeed within your own job lists.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Enable Backfill', 'wp-job-manager-indeed-integration' ),
+						'cb_label' 	=> __( 'Enable backfilling jobs from Indeed', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enabling this allows you to show sponsored job listings from Indeed within your own job lists.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'checkbox'
 					),
 
@@ -112,85 +112,85 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 						'name' 		=> 'job_manager_indeed_site_type',
 						'std' 		=> '',
 						'options'   => array(
-							''         => __( 'All web sites', 'job_manager_indeed' ),
-							'jobsite'  => __( 'Job boards only', 'job_manager_indeed' ),
-							'employer' => __( 'Employer websites only', 'job_manager_indeed' ),
+							''         => __( 'All web sites', 'wp-job-manager-indeed-integration' ),
+							'jobsite'  => __( 'Job boards only', 'wp-job-manager-indeed-integration' ),
+							'employer' => __( 'Employer websites only', 'wp-job-manager-indeed-integration' ),
 						),
-						'label' 	=> __( 'Site type', 'job_manager_indeed' ),
-						'desc'		=> __( 'Choose where results should come from.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Site type', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Choose where results should come from.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'select'
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_default_query',
 						'std' 		=> 'Web Developer',
-						'label' 	=> __( 'Default query', 'job_manager_indeed' ),
-						'desc'		=> __( 'Enter terms to search for by default. By default terms are ANDed.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Default query', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enter terms to search for by default. By default terms are ANDed.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_default_location',
 						'std' 		=> '',
-						'label' 	=> __( 'Default location', 'job_manager_indeed' ),
-						'desc'		=> __( 'Enter a location to search for by default.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Default location', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enter a location to search for by default.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_default_type',
 						'std' 		=> 'fulltime',
-						'label' 	=> __( 'Default job type', 'job_manager_indeed' ),
-						'desc'		=> __( 'Choose which type of job to query by default.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Default job type', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Choose which type of job to query by default.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'select',
 						'options'   => array(
-							'fulltime'   => __( 'Full time', 'job_manager_indeed' ),
-							'parttime'   => __( 'Part time', 'job_manager_indeed' ),
-							'contract'   => __( 'Contract', 'job_manager_indeed' ),
-							'internship' => __( 'Internship', 'job_manager_indeed' ),
-							'temporary'  => __( 'Temporary', 'job_manager_indeed' ),
+							'fulltime'   => __( 'Full time', 'wp-job-manager-indeed-integration' ),
+							'parttime'   => __( 'Part time', 'wp-job-manager-indeed-integration' ),
+							'contract'   => __( 'Contract', 'wp-job-manager-indeed-integration' ),
+							'internship' => __( 'Internship', 'wp-job-manager-indeed-integration' ),
+							'temporary'  => __( 'Temporary', 'wp-job-manager-indeed-integration' ),
 						),
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_default_country',
 						'std' 		=> 'us',
-						'label' 	=> __( 'Default country', 'job_manager_indeed' ),
-						'desc'		=> __( 'Choose a default country to show jobs from. See https://ads.indeed.com/jobroll/xmlfeed for the full list of supported country codes.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Default country', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Choose a default country to show jobs from. See https://ads.indeed.com/jobroll/xmlfeed for the full list of supported country codes.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 
 					array(
 						'name' 		=> 'job_manager_indeed_backfill',
 						'std' 		=> 10,
-						'label'     => __( 'Backfilling (no results)', 'job_manager_indeed' ),
-						'desc'		=> __( 'If there are no jobs found, backfill with X jobs from Indeed instead. Leave blank or set to 0 to disable.', 'job_manager_indeed' ),
+						'label'     => __( 'Backfilling (no results)', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'If there are no jobs found, backfill with X jobs from Indeed instead. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_before_jobs',
 						'std' 		=> '0',
-						'label' 	=> __( 'Backfill before jobs', 'job_manager_indeed' ),
-						'desc'		=> __( 'Show a maximum of X jobs from Indeed above your job listings. Leave blank or set to 0 to disable.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Backfill before jobs', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Show a maximum of X jobs from Indeed above your job listings. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_after_jobs',
 						'std' 		=> '0',
-						'label' 	=> __( 'Backfill after jobs', 'job_manager_indeed' ),
-						'desc'		=> __( 'Show a maximum of X jobs from Indeed after the last page of your job listings. Leave blank or set to 0 to disable.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Backfill after jobs', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Show a maximum of X jobs from Indeed after the last page of your job listings. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_per_page',
 						'std' 		=> '0',
-						'label' 	=> __( 'Backfill per page', 'job_manager_indeed' ),
-						'desc'		=> __( 'For each page of jobs loaded, show a maximum of X jobs from Indeed. Leave blank or set to 0 to disable.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Backfill per page', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'For each page of jobs loaded, show a maximum of X jobs from Indeed. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					
 					array(
 						'name' 		=> 'job_manager_indeed_show_attribution',
 						'std' 		=> 1,
-						'label' 	=> __( 'Attribution', 'job_manager_indeed' ),
-						'cb_label' 	=> __( 'Automatically show attribution', 'job_manager_indeed' ),
-						'desc'		=> __( 'Indeed require attribution when including their listings. Enable this to automatically display the attribution image.', 'job_manager_indeed' ),
+						'label' 	=> __( 'Attribution', 'wp-job-manager-indeed-integration' ),
+						'cb_label' 	=> __( 'Automatically show attribution', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Indeed require attribution when including their listings. Enable this to automatically display the attribution image.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'checkbox'
 					)
 				)
@@ -221,4 +221,4 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 	}
 }
 
-$GLOBALS['job_manager_indeed'] = new WP_Job_Manager_Indeed_Integration();
+$GLOBALS['wp-job-manager-indeed-integration'] = new WP_Job_Manager_Indeed_Integration();

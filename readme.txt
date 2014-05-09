@@ -31,6 +31,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 = 2.0.6 =
 * Add CO argument to shortcodes. Lets you change the default country.
+* Added POT file
+* Updated text domain
 
 = 2.0.5 =
 * Search title only when quering indeed. More relevance.
