@@ -229,7 +229,8 @@ class WPJM_Updater {
 	 */
 	public function key_notice() {
 		?><div class="updated">
-			<p><?php printf( 'To recieve updates for <strong>%s</strong> please enter your licence key <a href="%s">on the plugin page</a>.', esc_html( $this->plugin_data['Name'] ), esc_url( admin_url( 'plugins.php#' . sanitize_title( $this->plugin_slug ) ) ) ); ?></p>
+			<p><?php printf( '<a href="%s">Please enter your licence key</a> to get updates for "%s".', esc_url( admin_url( 'plugins.php#' . sanitize_title( $this->plugin_slug ) ) ), esc_html( $this->plugin_data['Name'] ) ); ?></p>
+			<p><small class="description"><?php printf( 'Lost your key? <a href="%s">Retrieve it here</a>.', esc_url( 'https://wpjobmanager.com/lost-licence-key/' ) ); ?></small></p>
 		</div><?php
 	}
 
