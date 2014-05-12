@@ -143,12 +143,16 @@ class WP_Job_Manager_Indeed_Import {
 			if ( ! empty( $address_data['country_short'] ) ) {
 				$search_country = $address_data['country_short'];
 			}
-		} 
+		}
+
+		if ( ! $search_keywords ) {
+			$search_keywords = get_option( 'job_manager_indeed_default_query' );
+		}
 		
 		$api_args = array(
 			'limit' => $return_jobs,
 			'sort'  => 'relevance',
-			'q'     => 'title:(' . ( $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_query' ) ) . ')',
+			'q'     => $search_keywords ? 'title:(' . $search_keywords . ')' : '',
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
 			'jt'    => $type,
@@ -209,7 +213,7 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args = shortcode_atts( apply_filters( 'job_manager_output_indeed_jobs_defaults', array(
 			'limit'  => 10, // Limit results
 			'sort'   => 'date', // relevance or date
-			'q'      => 'title:(' . get_option( 'job_manager_indeed_default_query' ) . ')', // Keywords
+			'q'      => ( $q = get_option( 'job_manager_indeed_default_query' ) ) ? 'title:(' . $q . ')' : '', // Keywords
 			'l'      => get_option( 'job_manager_indeed_default_location' ), // Location
 			'jt'     => get_option( 'job_manager_indeed_default_type' ), // type
 			'start'  => 0, // Offset
@@ -265,7 +269,7 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args['start']  = absint( isset( $api_args['start'] ) ? $api_args['start'] : 0 );
 		$api_args['radius'] = absint( isset( $api_args['radius'] ) ? $api_args['radius'] : 25 );
 		$api_args['sort']   = sanitize_text_field( isset( $api_args['sort'] ) ? $api_args['sort'] : 'relevance' );
-		$api_args['q']      = 'title:(' . sanitize_text_field( isset( $api_args['q'] ) ? $api_args['q'] : '' ) . ')';
+		$api_args['q']      = ( $q = sanitize_text_field( isset( $api_args['q'] ) ? $api_args['q'] : '' ) ) ? 'title:(' . $q . ')' : '';
 		$api_args['l']      = sanitize_text_field( isset( $api_args['l'] ) ? $api_args['l'] : '' );
 		$api_args['jt']     = sanitize_text_field( isset( $api_args['jt'] ) ? $api_args['jt'] : '' );
 		
