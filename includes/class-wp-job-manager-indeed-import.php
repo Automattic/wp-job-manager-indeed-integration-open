@@ -190,12 +190,14 @@ class WP_Job_Manager_Indeed_Import {
 			} else {
 				$result['html'] = ob_get_clean();
 			}
+
+			$found_jobs = true;
 		}
 
 		// Pagination setup
 		if ( $backfilling && $return_jobs ) {
 			$result['max_num_pages'] = ceil( $api->total_results / $return_jobs );
-			$result['found_jobs']    = true;
+			$result['found_jobs']    = $found_jobs;
 		}
 
 		return $result;
