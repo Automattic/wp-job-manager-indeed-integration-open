@@ -392,7 +392,7 @@ class WPJM_Updater {
 	 * @return object $response
 	 */
 	public function plugin_information( $args ) {
-		$request    = wp_remote_get( $this->api_url . '&' . http_build_query( $args ) );
+		$request    = wp_remote_get( $this->api_url . '&' . http_build_query( $args, '', '&' ) );
 
 		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
 			return false;

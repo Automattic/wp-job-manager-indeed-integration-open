@@ -20,7 +20,7 @@ class WPJM_Updater_Key_API {
 		);
 
 		$args    = wp_parse_args( $defaults, $args );
-		$request = wp_remote_get( self::$endpoint . '&' . http_build_query( $args ) );
+		$request = wp_remote_get( self::$endpoint . '&' . http_build_query( $args, '', '&' ) );
 
 		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
 			return false;
@@ -39,7 +39,7 @@ class WPJM_Updater_Key_API {
 		);
 
 		$args    = wp_parse_args( $defaults, $args );
-		$request = wp_remote_get( self::$endpoint . '&' . http_build_query( $args ) );
+		$request = wp_remote_get( self::$endpoint . '&' . http_build_query( $args, '', '&' ) );
 
 		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
 			return false;
