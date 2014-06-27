@@ -192,7 +192,16 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 						'cb_label' 	=> __( 'Automatically show attribution', 'wp-job-manager-indeed-integration' ),
 						'desc'		=> __( 'Indeed require attribution when including their listings. Enable this to automatically display the attribution image.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'checkbox'
-					)
+					),
+
+					array(
+						'name' 		=> 'job_manager_indeed_search_title_only',
+						'std' 		=> 1,
+						'label' 	=> __( 'Query titles', 'wp-job-manager-indeed-integration' ),
+						'cb_label' 	=> __( 'Query job titles only', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enabling this will search within Indeed job titles only. Otherwise the full description will be searched.', 'wp-job-manager-indeed-integration' ),
+						'type'      => 'checkbox'
+					),
 				)
 			)
 		);

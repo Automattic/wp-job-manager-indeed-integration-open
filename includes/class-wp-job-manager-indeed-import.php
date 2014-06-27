@@ -61,6 +61,18 @@ class WP_Job_Manager_Indeed_Import {
 	}
 
 	/**
+	 * Format search keyword
+	 * @param  string $keyword
+	 * @return string
+	 */
+	public function format_keyword( $keyword ) {
+		if ( get_option( 'job_manager_indeed_search_title_only', 1 ) ) {
+			$keyword = 'title:(' . $keyword . ')';
+		}
+		return $keyword;
+	}
+
+	/**
 	 * When getting results via ajax, show indeed listings
 	 * @param  array $result
 	 * @return array
@@ -152,7 +164,7 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args = array(
 			'limit' => $return_jobs,
 			'sort'  => 'relevance',
-			'q'     => $search_keywords ? 'title:(' . $search_keywords . ')' : '',
+			'q'     => $search_keywords ? $this->format_keyword( $search_keywords ) : '',
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
 			'jt'    => $type,
@@ -198,6 +210,10 @@ class WP_Job_Manager_Indeed_Import {
 		if ( $backfilling && $return_jobs ) {
 			$result['max_num_pages'] = ceil( $api->total_results / $return_jobs );
 			$result['found_jobs']    = $found_jobs;
+
+			if ( function_exists( 'get_job_listing_pagination' ) ) {
+				$result['pagination'] = get_job_listing_pagination( $result['max_num_pages'], absint( $_POST['page'] ) );
+			}
 		}
 
 		return $result;
@@ -215,7 +231,7 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args = shortcode_atts( apply_filters( 'job_manager_output_indeed_jobs_defaults', array(
 			'limit'  => 10, // Limit results
 			'sort'   => 'date', // relevance or date
-			'q'      => ( $q = get_option( 'job_manager_indeed_default_query' ) ) ? 'title:(' . $q . ')' : '', // Keywords
+			'q'      => ( $q = get_option( 'job_manager_indeed_default_query' ) ) ? $this->format_keyword( $q ) : '', // Keywords
 			'l'      => get_option( 'job_manager_indeed_default_location' ), // Location
 			'jt'     => get_option( 'job_manager_indeed_default_type' ), // type
 			'start'  => 0, // Offset
@@ -271,7 +287,7 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args['start']  = absint( isset( $api_args['start'] ) ? $api_args['start'] : 0 );
 		$api_args['radius'] = absint( isset( $api_args['radius'] ) ? $api_args['radius'] : 25 );
 		$api_args['sort']   = sanitize_text_field( isset( $api_args['sort'] ) ? $api_args['sort'] : 'relevance' );
-		$api_args['q']      = ( $q = sanitize_text_field( isset( $api_args['q'] ) ? $api_args['q'] : '' ) ) ? 'title:(' . $q . ')' : '';
+		$api_args['q']      = ( $q = sanitize_text_field( isset( $api_args['q'] ) ? $api_args['q'] : '' ) ) ? $this->format_keyword( $q ) : '';
 		$api_args['l']      = sanitize_text_field( isset( $api_args['l'] ) ? $api_args['l'] : '' );
 		$api_args['jt']     = sanitize_text_field( isset( $api_args['jt'] ) ? $api_args['jt'] : '' );
 		
