@@ -7,14 +7,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * WPJM_Updater
+ *
+ * @version  2.0
+ * @author  Mike Jolley
  */
 class WPJM_Updater {
-	private $plugin_name;
-	private $plugin_file;
-	private $plugin_slug;
-	private $api_url           = 'https://wpjobmanager.com/?wc-api=wp_plugin_licencing_update_api';
-	private $errors            = array();
-	private $plugin_data;
+	private $plugin_name = '';
+	private $plugin_file = '';
+	private $plugin_slug = '';
+	private $api_url     = 'https://wpjobmanager.com/?wc-api=wp_plugin_licencing_update_api';
+	private $errors      = array();
+	private $plugin_data = array();
 
 	/**
 	 * Constructor, used if called directly.
@@ -28,11 +31,10 @@ class WPJM_Updater {
 	 */
 	public function init_updates( $file ) {
 		$this->plugin_file = $file;
-		$this->plugin_slug = basename( dirname( $this->plugin_file ) );
-		$this->plugin_name = $this->plugin_slug . '/' . $this->plugin_slug . '.php';
+		$this->plugin_slug = str_replace( '.php', '', basename( $this->plugin_file ) );
+		$this->plugin_name = basename( dirname( $this->plugin_file ) ) . '/' . $this->plugin_slug . '.php';
 
-		register_activation_hook( basename( dirname( $this->plugin_file ) ) . '/' . basename( $this->plugin_file ), array( $this, 'activation' ), 10 );
-		register_deactivation_hook( basename( dirname( $this->plugin_file ) ) . '/' . basename( $this->plugin_file ), array( $this, 'deactivation' ), 10 );
+		register_deactivation_hook( $this->plugin_name, array( $this, 'deactivation' ), 10 );
 
 		add_filter( 'block_local_requests', '__return_false' );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
@@ -145,6 +147,9 @@ class WPJM_Updater {
 
 	/**
 	 * Add an error message
+	 * 
+	 * @param string $message Your error message
+	 * @param string $type    Type of error message
 	 */
 	public function add_error( $message, $type = '' ) {
 		if ( $type ) {
@@ -183,11 +188,6 @@ class WPJM_Updater {
 			}
 		}
 	}
-
-	/**
-	 * Ran on plugin activation
-	 */
-	public function activation() {}
 
 	/**
 	 * Ran on plugin-deactivation
@@ -373,6 +373,8 @@ class WPJM_Updater {
 	}
 
 	/**
+	 * Handle errors from the API
+	 * @param  array $errors
 	 */
 	public function handle_errors( $errors ) {
 		if ( ! empty( $errors['no_key'] ) ) {
