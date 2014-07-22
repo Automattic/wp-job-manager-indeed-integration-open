@@ -29,6 +29,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+* job_manager_indeed_import_format_keyword filter.
+
 = 2.0.8 =
 * Option to control whether or not it only searches the title, or the entire Indeed listing.
 * Updater update.

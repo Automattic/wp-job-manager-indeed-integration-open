@@ -69,7 +69,7 @@ class WP_Job_Manager_Indeed_Import {
 		if ( get_option( 'job_manager_indeed_search_title_only', 1 ) ) {
 			$keyword = 'title:(' . $keyword . ')';
 		}
-		return $keyword;
+		return apply_filters( 'job_manager_indeed_import_format_keyword', $keyword );
 	}
 
 	/**
