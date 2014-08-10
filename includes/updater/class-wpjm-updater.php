@@ -34,6 +34,7 @@ class WPJM_Updater {
 		$this->plugin_slug = str_replace( '.php', '', basename( $this->plugin_file ) );
 		$this->plugin_name = basename( dirname( $this->plugin_file ) ) . '/' . $this->plugin_slug . '.php';
 
+		register_activation_hook( $this->plugin_name, array( $this, 'activation' ), 10 );
 		register_deactivation_hook( $this->plugin_name, array( $this, 'deactivation' ), 10 );
 
 		add_filter( 'block_local_requests', '__return_false' );
@@ -57,7 +58,9 @@ class WPJM_Updater {
 		$this->activation_email = get_option( $this->plugin_slug . '_email' );
 
 		// Activated notice
-		if ( ! empty( $_GET['activated_licence'] ) && $_GET['activated_licence'] === $this->plugin_slug ) {
+		if ( ! empty( $_GET[ 'dismiss-' . sanitize_title( $this->plugin_slug ) ] ) ) {
+			update_option( $this->plugin_slug . '_hide_key_notice', 1 );
+		} elseif ( ! empty( $_GET['activated_licence'] ) && $_GET['activated_licence'] === $this->plugin_slug ) {
 			add_action( 'admin_notices', array( $this, 'activated_key_notice' ) );
 		} elseif ( ! empty( $_GET['deactivated_licence'] ) && $_GET['deactivated_licence'] === $this->plugin_slug ) {
 			add_action( 'admin_notices', array( $this, 'deactivated_key_notice' ) );
@@ -125,7 +128,7 @@ class WPJM_Updater {
 			exit;
 		}
 
-		if ( ! $this->api_key && sizeof( $this->errors ) === 0 ) {
+		if ( ! $this->api_key && sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
 			add_action( 'admin_notices', array( $this, 'key_notice' ) );
 		}
 
@@ -190,6 +193,13 @@ class WPJM_Updater {
 	}
 
 	/**
+	 * Ran on plugin-activation
+	 */
+	public function activation() {
+		delete_option( $this->plugin_slug . '_hide_key_notice' );
+	}
+
+	/**
 	 * Ran on plugin-deactivation
 	 */
 	public function deactivation() {
@@ -229,6 +239,7 @@ class WPJM_Updater {
 	 */
 	public function key_notice() {
 		?><div class="updated">
+			<p class="wpjm-updater-dismiss" style="float:right;"><a href="<?php echo esc_url( add_query_arg( 'dismiss-' . sanitize_title( $this->plugin_slug ), '1' ) ); ?>"><?php _e( 'Hide notice' ); ?></a></p>
 			<p><?php printf( '<a href="%s">Please enter your licence key</a> to get updates for "%s".', esc_url( admin_url( 'plugins.php#' . sanitize_title( $this->plugin_slug ) ) ), esc_html( $this->plugin_data['Name'] ) ); ?></p>
 			<p><small class="description"><?php printf( 'Lost your key? <a href="%s">Retrieve it here</a>.', esc_url( 'https://wpjobmanager.com/lost-licence-key/' ) ); ?></small></p>
 		</div><?php
