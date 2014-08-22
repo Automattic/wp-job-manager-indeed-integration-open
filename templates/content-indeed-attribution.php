@@ -1,3 +1,3 @@
 <li class="indeed_attribution job_listing">
-	<a href="http://www.indeed.com/">jobs by <img src="//www.indeed.com/p/jobsearch.gif" style="border: 0; vertical-align: middle;" alt="Indeed job search"></a>                           
+	<a href="http://www.indeed.com/">jobs by <img src="<?php echo JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/images/jobsearch.gif'; ?>" style="border: 0; vertical-align: middle;" alt="Indeed job search"></a>
 </li>
