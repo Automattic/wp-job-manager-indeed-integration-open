@@ -29,6 +29,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+* Fix for categories not set on export.
+
 = 2.0.10 =
 * Bundle Indeed logo so it works with SSL.
 

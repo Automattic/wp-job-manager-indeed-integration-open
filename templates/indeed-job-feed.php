@@ -50,36 +50,36 @@ $query = new WP_Query( $args );
 while ( $query->have_posts() ) : $query->the_post();
 
 	// Recommended format: http://www.indeed.com/intl/en/xmlinfo.html
-	
+
 	// Start Job Element
 	$job_element = $xml_document->createElement( "job" );
-	
+
 	// Job title
 	$title = $xml_document->createElement("title");
 	$title->appendChild($xml_document->createCDATASection( get_the_title() ) );
 	$job_element->appendChild( $title );
-	
+
 	// Company name
 	$company_name = get_post_meta( get_the_ID(),'_company_name',true);
 	$company = $xml_document->createElement("company");
 	$company->appendChild($xml_document->createCDATASection( $company_name ));
 	$job_element->appendChild($company);
-	
+
 	// Job date
 	$date = $xml_document->createElement("date");
 	$date->appendChild($xml_document->createCDATASection( get_the_date() ));
 	$job_element->appendChild($date);
-	
+
 	// Job ID
 	$rooteferencenumber = $xml_document->createElement("referencenumber");
 	$rooteferencenumber->appendChild($xml_document->createCDATASection( get_the_ID() ));
 	$job_element->appendChild($rooteferencenumber);
-	
+
 	// Job direct URL
 	$url = $xml_document->createElement("url");
 	$url->appendChild($xml_document->createCDATASection(get_permalink( get_the_ID() )));
 	$job_element->appendChild($url);
-	
+
 	// Job Description
 	$description = $xml_document->createElement("description");
 	$description->appendChild($xml_document->createCDATASection( ( strip_tags( str_replace( "</p>", "\n\n", get_the_content() ) ) ) ) );
@@ -96,13 +96,13 @@ while ( $query->have_posts() ) : $query->the_post();
 	$get_city = explode( ',', get_post_meta( get_the_ID(), 'geolocation_city', true ) );
 	$city->appendChild($xml_document->createCDATASection( $get_city[0] ) );
 	$job_element->appendChild($city);
-	
+
 	// State
 	$state = $xml_document->createElement("state");
 	$get_state = explode( ',', get_post_meta( get_the_ID(), 'geolocation_state_short', true ) );
 	$state->appendChild($xml_document->createCDATASection( $get_state[0] ) );
 	$job_element->appendChild($state);
-	
+
 	// Country
 	$country = $xml_document->createElement("country");
 	$get_country = substr( get_post_meta( get_the_ID(), 'geolocation_country_short', true ), -2);
@@ -112,12 +112,16 @@ while ( $query->have_posts() ) : $query->the_post();
 	// Categories
 	$category = $xml_document->createElement("category");
 	$categories = wp_get_post_terms( get_the_ID(), 'job_listing_category', array( "fields" => "names" ) );
-	$category->appendChild( $xml_document->createCDATASection( implode( ',', $categories ) ) );
+	if ( $categories && ! is_wp_error( $categories ) ) {
+		$category->appendChild( $xml_document->createCDATASection( implode( ',', $categories ) ) );
+	} else {
+		$category->appendChild( $xml_document->createCDATASection() );
+	}
 	$job_element->appendChild( $category );
-	
+
 	// End Job Element
 	$root->appendChild( $job_element );
 
 endwhile;
 
-echo $xml_document->saveXML(); 
+echo $xml_document->saveXML();
