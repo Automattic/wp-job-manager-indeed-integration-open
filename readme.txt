@@ -29,6 +29,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+* Added support for job regions plugin.
+
 = 2.0.11 =
 * Fix for categories not set on export.
 

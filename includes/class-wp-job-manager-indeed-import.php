@@ -36,7 +36,7 @@ class WP_Job_Manager_Indeed_Import {
 		wp_localize_script( 'wp-job-manager-indeed-jobs', 'job_manager_indeed_jobs', array(
 			'ajax_url' => admin_url('admin-ajax.php')
 		) );
-	}	
+	}
 
 	/**
 	 * Get the type we are querying
@@ -92,6 +92,14 @@ class WP_Job_Manager_Indeed_Import {
 		$found_jobs       = $result['found_jobs'];
 		$backfilling      = false;
 		$page             = isset( $_POST['page'] ) ? $_POST['page'] : 1;
+
+		if ( isset( $_POST['form_data'] ) && taxonomy_exists( 'job_listing_region' ) ) {
+			parse_str( $_POST['form_data'], $post_data );
+			if ( ! empty( $post_data['search_region'] ) ) {
+				$term = get_term_by( 'id', absint( $post_data['search_region'] ), 'job_listing_region' );
+				$search_location = $term->name;
+			}
+		}
 
 		// If local jobs were found
 		if ( $result['found_jobs'] ) {
@@ -160,7 +168,7 @@ class WP_Job_Manager_Indeed_Import {
 		if ( ! $search_keywords ) {
 			$search_keywords = get_option( 'job_manager_indeed_default_query' );
 		}
-		
+
 		$api_args = array(
 			'limit' => $return_jobs,
 			'sort'  => 'relevance',
@@ -278,11 +286,11 @@ class WP_Job_Manager_Indeed_Import {
 	 */
 	public function ajax_get_indeed_listings() {
 		global $indeed_job;
-		
+
 		$result             = array();
 		$page               = absint( $_POST['page'] );
 		$api_args           = (array) $_POST['api_args'];
-		
+
 		$api_args['limit']  = absint( isset( $api_args['limit'] ) ? $api_args['limit'] : 10 );
 		$api_args['start']  = absint( isset( $api_args['start'] ) ? $api_args['start'] : 0 );
 		$api_args['radius'] = absint( isset( $api_args['radius'] ) ? $api_args['radius'] : 25 );
@@ -290,9 +298,9 @@ class WP_Job_Manager_Indeed_Import {
 		$api_args['q']      = ( $q = sanitize_text_field( isset( $api_args['q'] ) ? $api_args['q'] : '' ) ) ? $this->format_keyword( $q ) : '';
 		$api_args['l']      = sanitize_text_field( isset( $api_args['l'] ) ? $api_args['l'] : '' );
 		$api_args['jt']     = sanitize_text_field( isset( $api_args['jt'] ) ? $api_args['jt'] : '' );
-		
+
 		$api_args['start']  = $api_args['start'] + ( $api_args['limit'] * ( $page - 1 ) );
-		
+
 		$api                = new WP_Job_Manager_Indeed_API();
 		$jobs               = $api->get_jobs( $api_args );
 
