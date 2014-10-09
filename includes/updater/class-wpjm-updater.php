@@ -52,7 +52,7 @@ class WPJM_Updater {
 		add_action( 'shutdown', array( $this, 'store_errors' ) );
 		add_action( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_updates' ) );
 		add_filter( 'plugins_api', array( $this, 'plugins_api' ), 10, 3 );
-		
+
 		$this->plugin_data      = get_plugin_data( $this->plugin_file );
 		$this->api_key          = get_option( $this->plugin_slug . '_licence_key' );
 		$this->activation_email = get_option( $this->plugin_slug . '_email' );
@@ -91,8 +91,8 @@ class WPJM_Updater {
 
 				include_once( 'class-wpjm-updater-key-api.php' );
 
-				$activate_results = json_decode( WPJM_Updater_Key_API::activate( array( 
-					'email'          => $email, 
+				$activate_results = json_decode( WPJM_Updater_Key_API::activate( array(
+					'email'          => $email,
 					'licence_key'    => $licence_key,
 					'api_product_id' => $this->plugin_slug
 				) ), true );
@@ -109,11 +109,11 @@ class WPJM_Updater {
 
 					wp_redirect( admin_url( 'plugins.php?activated_licence=' . $this->plugin_slug. '#wpwrap' ) );
 					exit;
-				
+
 				} elseif ( $activate_results === false ) {
-					
+
 					throw new Exception( 'Connection failed to the Licence Key API server. Try again later.' );
-				
+
 				} elseif ( isset( $activate_results['error_code'] ) ) {
 
 					throw new Exception( $activate_results['error'] );
@@ -150,7 +150,7 @@ class WPJM_Updater {
 
 	/**
 	 * Add an error message
-	 * 
+	 *
 	 * @param string $message Your error message
 	 * @param string $type    Type of error message
 	 */
@@ -238,6 +238,9 @@ class WPJM_Updater {
 	 * Show a notice prompting the user to update
 	 */
 	public function key_notice() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 		?><div class="updated">
 			<p class="wpjm-updater-dismiss" style="float:right;"><a href="<?php echo esc_url( add_query_arg( 'dismiss-' . sanitize_title( $this->plugin_slug ), '1' ) ); ?>"><?php _e( 'Hide notice' ); ?></a></p>
 			<p><?php printf( '<a href="%s">Please enter your licence key</a> to get updates for "%s".', esc_url( admin_url( 'plugins.php#' . sanitize_title( $this->plugin_slug ) ) ), esc_html( $this->plugin_data['Name'] ) ); ?></p>
@@ -359,7 +362,7 @@ class WPJM_Updater {
 		// Get the current version
 		$plugin_info = get_site_transient( 'update_plugins' );
 		$current_ver = isset( $plugin_info->checked[ $this->plugin_name ] ) ? $plugin_info->checked[ $this->plugin_name ] : '';
-		
+
 		$args = array(
 			'request'        => 'plugininformation',
 			'plugin_name'    => $this->plugin_name,
