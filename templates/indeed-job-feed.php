@@ -115,7 +115,7 @@ while ( $query->have_posts() ) : $query->the_post();
 	if ( $categories && ! is_wp_error( $categories ) ) {
 		$category->appendChild( $xml_document->createCDATASection( implode( ',', $categories ) ) );
 	} else {
-		$category->appendChild( $xml_document->createCDATASection() );
+		$category->appendChild( $xml_document->createCDATASection( '' ) );
 	}
 	$job_element->appendChild( $category );
 
