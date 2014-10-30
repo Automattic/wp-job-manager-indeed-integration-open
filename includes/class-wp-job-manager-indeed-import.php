@@ -78,21 +78,17 @@ class WP_Job_Manager_Indeed_Import {
 	 * @return array
 	 */
 	public function job_manager_get_listings_result( $result ) {
-		global $indeed_job, $indeed_query_count;
-
-		ob_start();
-
 		$types            = get_job_listing_types();
 		$filter_job_types = isset( $_POST['filter_job_type'] ) ? array_filter( array_map( 'sanitize_title', (array) $_POST['filter_job_type'] ) ) : null;
 		$search_location  = sanitize_text_field( stripslashes( $_POST['search_location'] ) );
 		$search_keywords  = sanitize_text_field( stripslashes( $_POST['search_keywords'] ) );
 		$return_jobs      = false;
-		$insert_jobs      = 'before';
 		$job_start        = 0;
 		$found_jobs       = $result['found_jobs'];
 		$backfilling      = false;
 		$page             = isset( $_POST['page'] ) ? $_POST['page'] : 1;
 
+		// Regions integration
 		if ( isset( $_POST['form_data'] ) && taxonomy_exists( 'job_listing_region' ) ) {
 			parse_str( $_POST['form_data'], $post_data );
 			if ( ! empty( $post_data['search_region'] ) ) {
@@ -101,37 +97,7 @@ class WP_Job_Manager_Indeed_Import {
 			}
 		}
 
-		// If local jobs were found
-		if ( $result['found_jobs'] ) {
-
-			if ( $page == 1 && get_option( 'job_manager_indeed_before_jobs' ) ) {
-
-				$return_jobs = get_option( 'job_manager_indeed_before_jobs' );
-
-			} elseif ( $page == $result['max_num_pages'] && get_option( 'job_manager_indeed_after_jobs' ) ) {
-
-				$insert_jobs = 'after';
-				$job_start   = get_option( 'job_manager_indeed_before_jobs' ) + ( get_option( 'job_manager_indeed_per_page' ) * $page );
-				$return_jobs = get_option( 'job_manager_indeed_after_jobs' );
-
-			} elseif ( $page > 1 && $page != $result['max_num_pages'] && get_option( 'job_manager_indeed_per_page' ) ) {
-
-				$job_start   = get_option( 'job_manager_indeed_before_jobs' ) + ( get_option( 'job_manager_indeed_per_page' ) * $page );
-				$return_jobs = get_option( 'job_manager_indeed_per_page' );
-
-			}
-
-		// No jobs were found
-		} elseif ( get_option( 'job_manager_indeed_backfill' ) ) {
-			$return_jobs = get_option( 'job_manager_indeed_backfill' );
-			$backfilling = true;
-			$job_start   = $return_jobs * ( $page - 1 );
-		}
-
-		if ( ! $return_jobs ) {
-			return $result;
-		}
-
+		// See what type of jobs we are querying
 		if ( sizeof( $filter_job_types ) !== sizeof( $types ) ) {
 			$type = $filter_job_types[ 0 ];
 			switch ( $type ) {
@@ -169,27 +135,94 @@ class WP_Job_Manager_Indeed_Import {
 			$search_keywords = get_option( 'job_manager_indeed_default_query' );
 		}
 
-		$api_args = array(
-			'limit' => $return_jobs,
+		$found_indeed_jobs = false;
+		$api_args          = array(
 			'sort'  => 'relevance',
 			'q'     => $search_keywords ? $this->format_keyword( $search_keywords ) : '',
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
-			'jt'    => $type,
-			'start' => $job_start
+			'jt'    => $type
 		);
-		$api      = new WP_Job_Manager_Indeed_API();
-		$jobs     = $api->get_jobs( $api_args );
+
+		// If local jobs were found...
+		if ( $result['found_jobs'] ) {
+
+			if ( 1 == $page && ( $limit = get_option( 'job_manager_indeed_before_jobs' ) ) ) {
+				$indeed_jobs_html = $this->get_jobs_html( array_merge( $api_args, array(
+					'limit' => $limit,
+					'start' => $job_start
+				) ) );
+
+				if ( $indeed_jobs_html ) {
+					$found_indeed_jobs    = true;
+					$result['found_jobs'] = true;
+					$result['html']       = $indeed_jobs_html . $result['html'];
+				}
+			}
+
+			if ( ( $page == $result['max_num_pages'] && ( $limit = get_option( 'job_manager_indeed_after_jobs' ) ) ) || ( $page > 1 && $page != $result['max_num_pages'] && ( $limit = get_option( 'job_manager_indeed_per_page' ) ) ) ) {
+				$indeed_jobs_html = $this->get_jobs_html( array_merge( $api_args, array(
+					'limit' => $limit,
+					'start' => get_option( 'job_manager_indeed_before_jobs' ) + ( get_option( 'job_manager_indeed_per_page' ) * $page )
+				) ) );
+
+				if ( $indeed_jobs_html ) {
+					$found_indeed_jobs    = true;
+					$result['found_jobs'] = true;
+					$result['html']       = $result['html'] . $indeed_jobs_html;
+				}
+			}
+
+		// No jobs were found
+		} elseif ( $limit = get_option( 'job_manager_indeed_backfill' ) ) {
+			$indeed_jobs_html = $this->get_jobs_html( array_merge( $api_args, array(
+				'limit' => $limit,
+				'start' => $limit * ( $page - 1 )
+			) ) );
+
+			if ( $indeed_jobs_html ) {
+				$backfilling          = true;
+				$found_indeed_jobs    = true;
+				$result['found_jobs'] = true;
+				$result['html']       = $indeed_jobs_html;
+			}
+		}
+
+		// Pagination setup
+		if ( $backfilling && $found_indeed_jobs ) {
+			$result['max_num_pages'] = ceil( WP_Job_Manager_Indeed_API::$total_results / get_option( 'job_manager_indeed_backfill' ) );
+
+			if ( function_exists( 'get_job_listing_pagination' ) ) {
+				$result['pagination'] = get_job_listing_pagination( $result['max_num_pages'], absint( $_POST['page'] ) );
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Query and get jobs html
+	 * @param  array $api_args
+	 * @return string
+	 */
+	public function get_jobs_html( $api_args ) {
+		global $indeed_job;
+
+		$jobs = WP_Job_Manager_Indeed_API::get_jobs( $api_args );
 
 		if ( $jobs ) {
+
+			ob_start();
 
 			if ( get_option( 'job_manager_indeed_show_attribution' ) ) {
 				get_job_manager_template_part( 'content', 'indeed-attribution', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
 			}
 
 			foreach ( $jobs as $indeed_job ) {
-				$indeed_job           = (object) $indeed_job;
-				$indeed_job->job_type = $this->get_mapped_job_type( $type );
+				$indeed_job            = (object) $indeed_job;
+				$indeed_job->job_type  = $this->get_mapped_job_type( $api_args['jt'] );
+				$indeed_job->longitude = isset( $indeed_job->longitude ) ? $indeed_job->longitude : '';
+				$indeed_job->latitude  = isset( $indeed_job->latitude ) ? $indeed_job->latitude : '';
 
 				$term = get_term_by( 'slug', $indeed_job->job_type, 'job_listing_type' );
 				if ( $term && ! is_wp_error( $term ) ) {
@@ -201,30 +234,10 @@ class WP_Job_Manager_Indeed_Import {
 				get_job_manager_template_part( 'content', 'indeed-job-listing', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
 			}
 
-			if ( $found_jobs ) {
-				if ( $insert_jobs == 'before' ) {
-					$result['html'] = ob_get_clean() . $result['html'];
-				} else {
-					$result['html'] .= ob_get_clean();
-				}
-			} else {
-				$result['html'] = ob_get_clean();
-			}
-
-			$found_jobs = true;
+			return ob_get_clean();
 		}
 
-		// Pagination setup
-		if ( $backfilling && $return_jobs ) {
-			$result['max_num_pages'] = ceil( $api->total_results / $return_jobs );
-			$result['found_jobs']    = $found_jobs;
-
-			if ( function_exists( 'get_job_listing_pagination' ) ) {
-				$result['pagination'] = get_job_listing_pagination( $result['max_num_pages'], absint( $_POST['page'] ) );
-			}
-		}
-
-		return $result;
+		return '';
 	}
 
 	/**
@@ -247,8 +260,7 @@ class WP_Job_Manager_Indeed_Import {
 			'co'     => get_option( 'job_manager_indeed_default_country' )
 		) ), $atts );
 
-		$api      = new WP_Job_Manager_Indeed_API();
-		$jobs     = $api->get_jobs( $api_args );
+		$jobs     = WP_Job_Manager_Indeed_API::get_jobs( $api_args );
 
 		if ( $jobs ) {
 			echo '<ul class="job_listings">';
@@ -270,7 +282,7 @@ class WP_Job_Manager_Indeed_Import {
 			}
 			echo '</ul>';
 
-			if ( $api->total_results > $api_args['limit'] ) {
+			if ( WP_Job_Manager_Indeed_API::$total_results > $api_args['limit'] ) {
 
 				wp_enqueue_script( 'wp-job-manager-indeed-jobs' );
 
@@ -301,8 +313,7 @@ class WP_Job_Manager_Indeed_Import {
 
 		$api_args['start']  = $api_args['start'] + ( $api_args['limit'] * ( $page - 1 ) );
 
-		$api                = new WP_Job_Manager_Indeed_API();
-		$jobs               = $api->get_jobs( $api_args );
+		$jobs               = WP_Job_Manager_Indeed_API::get_jobs( $api_args );
 
 		ob_start();
 
@@ -326,7 +337,7 @@ class WP_Job_Manager_Indeed_Import {
 		}
 
 		$result['html']          = ob_get_clean();
-		$result['max_num_pages'] = ceil( $api->total_results / $api_args['limit'] );
+		$result['max_num_pages'] = ceil( WP_Job_Manager_Indeed_API::$total_results / $api_args['limit'] );
 
 		echo '<!--WPJM-->';
 		echo json_encode( apply_filters( 'job_manager_get_indeed_listings_result', $result ) );
