@@ -31,6 +31,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 = 2.0.13 =
 * Trigger handler fix.
+* Rewrote import class to support prepending and appending jobs at the same time, if you only have a local list of jobs 1 page long.
+* Fixed notices.
 
 = 2.0.12 =
 * Fix category in export feed.
