@@ -72,7 +72,7 @@ jQuery( document ).ready( function ( $ ) {
 
 		$( this ).data( 'page', ( page + 1 ) );
 
-		target.trigger( 'update_results', [ page + 1, true ] );
+		target.triggerHandler( 'update_results', [ page + 1, true ] );
 
 		return false;
 	} );
