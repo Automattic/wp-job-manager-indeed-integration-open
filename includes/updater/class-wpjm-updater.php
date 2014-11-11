@@ -173,7 +173,9 @@ class WPJM_Updater {
 	 * Store errors in option
 	 */
 	public function store_errors() {
-		update_option( $this->plugin_slug . '_errors', $this->errors );
+		if ( $this->errors ) {
+			update_option( $this->plugin_slug . '_errors', $this->errors );
+		}
 	}
 
 	/**
