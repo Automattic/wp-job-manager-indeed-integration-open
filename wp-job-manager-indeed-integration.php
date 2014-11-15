@@ -3,7 +3,7 @@
 Plugin Name: WP Job Manager - Indeed Integration
 Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
 Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
-Version: 2.0.15
+Version: 2.0.16
 Author: Mike Jolley
 Author URI: http://mikejolley.com
 Requires at least: 3.8
@@ -33,7 +33,7 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '2.0.15' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '2.0.16' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
@@ -124,7 +124,7 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 						'name' 		=> 'job_manager_indeed_default_query',
 						'std' 		=> 'Web Developer',
 						'label' 	=> __( 'Default query', 'wp-job-manager-indeed-integration' ),
-						'desc'		=> __( 'Enter terms to search for by default. By default terms are ANDed.', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enter terms to search for by default. By default terms are ANDed. Search for multiple terms at once by using the "or" keyword between each keyword. e.g. <code>Term1 or Term2</code>', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
