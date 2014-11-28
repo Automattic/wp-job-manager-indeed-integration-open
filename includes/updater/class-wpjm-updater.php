@@ -8,14 +8,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * WPJM_Updater
  *
- * @version  2.0
+ * @version 3.0
  * @author  Mike Jolley
  */
 class WPJM_Updater {
 	private $plugin_name = '';
 	private $plugin_file = '';
 	private $plugin_slug = '';
-	private $api_url     = 'https://wpjobmanager.com/?wc-api=wp_plugin_licencing_update_api';
 	private $errors      = array();
 	private $plugin_data = array();
 
@@ -34,18 +33,21 @@ class WPJM_Updater {
 		$this->plugin_slug = str_replace( '.php', '', basename( $this->plugin_file ) );
 		$this->plugin_name = basename( dirname( $this->plugin_file ) ) . '/' . $this->plugin_slug . '.php';
 
-		register_activation_hook( $this->plugin_name, array( $this, 'activation' ), 10 );
-		register_deactivation_hook( $this->plugin_name, array( $this, 'deactivation' ), 10 );
+		register_activation_hook( $this->plugin_name, array( $this, 'plugin_activation' ), 10 );
+		register_deactivation_hook( $this->plugin_name, array( $this, 'plugin_deactivation' ), 10 );
 
 		add_filter( 'block_local_requests', '__return_false' );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+
+		include_once( 'class-wpjm-updater-api.php' );
+		include_once( 'class-wpjm-updater-key-api.php' );
 	}
 
 	/**
 	 * Ran on WP admin_init hook
 	 */
 	public function admin_init() {
-		global $wp_version, $wpjm_updater_runonce;
+		global $wp_version;
 
 		$this->load_errors();
 
@@ -53,99 +55,80 @@ class WPJM_Updater {
 		add_action( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_updates' ) );
 		add_filter( 'plugins_api', array( $this, 'plugins_api' ), 10, 3 );
 
-		$this->plugin_data      = get_plugin_data( $this->plugin_file );
 		$this->api_key          = get_option( $this->plugin_slug . '_licence_key' );
 		$this->activation_email = get_option( $this->plugin_slug . '_email' );
+		$this->plugin_data      = get_plugin_data( $this->plugin_file );
 
-		// Activated notice
-		if ( ! empty( $_GET[ 'dismiss-' . sanitize_title( $this->plugin_slug ) ] ) ) {
+		if ( current_user_can( 'update_plugins' ) ) {
+			$this->admin_requests();
+			$this->init_key_ui();
+		}
+	}
+
+	/**
+	 * Process admin requests
+	 */
+	private function admin_requests() {
+		if ( ! empty( $_POST[ $this->plugin_slug . '_licence_key' ] ) ) {
+			$this->activate_licence_request();
+		} elseif ( ! empty( $_GET[ 'dismiss-' . sanitize_title( $this->plugin_slug ) ] ) ) {
 			update_option( $this->plugin_slug . '_hide_key_notice', 1 );
 		} elseif ( ! empty( $_GET['activated_licence'] ) && $_GET['activated_licence'] === $this->plugin_slug ) {
-			add_action( 'admin_notices', array( $this, 'activated_key_notice' ) );
+			$this->add_notice( array( $this, 'activated_key_notice' ) );
 		} elseif ( ! empty( $_GET['deactivated_licence'] ) && $_GET['deactivated_licence'] === $this->plugin_slug ) {
-			add_action( 'admin_notices', array( $this, 'deactivated_key_notice' ) );
+			$this->add_notice( array( $this, 'deactivated_key_notice' ) );
+		} elseif ( ! empty( $_GET[ $this->plugin_slug . '_deactivate_licence' ] ) ) {
+			$this->deactivate_licence_request();
 		}
+	}
 
-		// de-activate link
-		if ( ! empty( $_GET[ $this->plugin_slug . '_deactivate_licence' ] ) ) {
-			$this->deactivate_licence();
-			wp_redirect( admin_url( 'plugins.php?deactivated_licence=' . $this->plugin_slug ) );
+	/**
+	 * Deactivate a licence request
+	 */
+	private function deactivate_licence_request() {
+		$this->deactivate_licence();
+		wp_redirect( remove_query_arg( array( 'activated_licence', $this->plugin_slug . '_deactivate_licence' ), add_query_arg( 'deactivated_licence', $this->plugin_slug ) ) );
+		exit;
+	}
+
+	/**
+	 * Activate a licence request
+	 */
+	private function activate_licence_request() {
+		$licence_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_licence_key' ] );
+		$email       = sanitize_text_field( $_POST[ $this->plugin_slug . '_email' ] );
+
+		if ( $this->activate_licence( $licence_key, $email ) ) {
+			wp_redirect( remove_query_arg( array( 'deactivated_licence', $this->plugin_slug . '_deactivate_licence' ), add_query_arg( 'activated_licence', $this->plugin_slug ) ) );
+			exit;
+		} else {
+			wp_redirect( remove_query_arg( array( 'activated_licence', 'deactivated_licence', $this->plugin_slug . '_deactivate_licence' ) ) );
 			exit;
 		}
+	}
 
-		// Posted key?
-		if ( ! empty( $_POST[ $this->plugin_slug . '_licence_key' ] ) ) {
-
-			try {
-
-				$licence_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_licence_key' ] );
-				$email       = sanitize_text_field( $_POST[ $this->plugin_slug . '_email' ] );
-
-				if ( empty( $licence_key ) ) {
-					throw new Exception( 'Please enter your licence key' );
-				}
-
-				if ( empty( $email ) ) {
-					throw new Exception( 'Please enter the email address associated with your licence' );
-				}
-
-				include_once( 'class-wpjm-updater-key-api.php' );
-
-				$activate_results = json_decode( WPJM_Updater_Key_API::activate( array(
-					'email'          => $email,
-					'licence_key'    => $licence_key,
-					'api_product_id' => $this->plugin_slug
-				) ), true );
-
-				if ( ! empty( $activate_results['activated'] ) ) {
-
-					$this->api_key          = $licence_key;
-					$this->activation_email = $email;
-					$this->errors           = array();
-
-					update_option( $this->plugin_slug . '_licence_key', $this->api_key );
-					update_option( $this->plugin_slug . '_email', $this->activation_email );
-					delete_option( $this->plugin_slug . '_errors' );
-
-					wp_redirect( admin_url( 'plugins.php?activated_licence=' . $this->plugin_slug. '#wpwrap' ) );
-					exit;
-
-				} elseif ( $activate_results === false ) {
-
-					throw new Exception( 'Connection failed to the Licence Key API server. Try again later.' );
-
-				} elseif ( isset( $activate_results['error_code'] ) ) {
-
-					throw new Exception( $activate_results['error'] );
-
-				}
-
-			} catch ( Exception $e ) {
-				$this->add_error( $e->getMessage() );
-			}
-
-			wp_redirect( admin_url( 'plugins.php#wpwrap' ) );
-			exit;
-		}
-
-		if ( ! $this->api_key && sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
-			add_action( 'admin_notices', array( $this, 'key_notice' ) );
-		}
-
+	/**
+	 * Init keys UI
+	 */
+	private function init_key_ui() {
 		if ( ! $this->api_key ) {
-			add_action( 'after_plugin_row', array( $this, 'key_input' ) );
-		}
-
-		if ( ! $wpjm_updater_runonce ) {
 			add_action( 'admin_print_styles-plugins.php', array( $this, 'styles' ) );
-			$wpjm_updater_runonce = true;
+			add_action( 'after_plugin_row', array( $this, 'key_input' ) );
+			$this->add_notice( array( $this, 'key_notice' ) );
+		} else {
+			add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'multisite_updates' ), 10, 2 );
+			add_filter( 'plugin_action_links_' . $this->plugin_name, array( $this, 'action_links' ) );
 		}
 
-		if ( $this->api_key ) {
-			add_filter( 'plugin_action_links_' . plugin_basename( $this->plugin_file ), array( $this, 'action_links' ) );
-		}
+		$this->add_notice( array( $this, 'error_notices' ) );
+	}
 
-		add_action( 'admin_notices', array( $this, 'error_notices' ) );
+	/**
+	 * Add notices
+	 */
+	private function add_notice( $callback ) {
+		add_action( 'admin_notices', $callback );
+		add_action( 'network_admin_notices', $callback );
 	}
 
 	/**
@@ -173,8 +156,10 @@ class WPJM_Updater {
 	 * Store errors in option
 	 */
 	public function store_errors() {
-		if ( $this->errors ) {
+		if ( sizeof( $this->errors ) > 0 ) {
 			update_option( $this->plugin_slug . '_errors', $this->errors );
+		} else {
+			delete_option( $this->plugin_slug . '_errors' );
 		}
 	}
 
@@ -184,9 +169,7 @@ class WPJM_Updater {
 	public function error_notices() {
 		if ( ! empty( $this->errors ) ) {
 			foreach ( $this->errors as $key => $error ) {
-				?><div class="error">
-					<p><?php echo wp_kses_post( $error ); ?></p>
-				</div><?php
+				include( 'views/html-error-notice.php' );
 				if ( $key !== 'invalid_key' ) {
 					unset( $this->errors[ $key ] );
 				}
@@ -197,23 +180,68 @@ class WPJM_Updater {
 	/**
 	 * Ran on plugin-activation
 	 */
-	public function activation() {
+	public function plugin_activation() {
 		delete_option( $this->plugin_slug . '_hide_key_notice' );
 	}
 
 	/**
 	 * Ran on plugin-deactivation
 	 */
-	public function deactivation() {
+	public function plugin_deactivation() {
 		$this->deactivate_licence();
+	}
+
+	/**
+	 * Try to activate a licence
+	 */
+	public function activate_licence( $licence_key, $email ) {
+		try {
+			if ( empty( $licence_key ) ) {
+				throw new Exception( 'Please enter your licence key' );
+			}
+
+			if ( empty( $email ) ) {
+				throw new Exception( 'Please enter the email address associated with your licence' );
+			}
+
+			$activate_results = json_decode( WPJM_Updater_Key_API::activate( array(
+				'email'          => $email,
+				'licence_key'    => $licence_key,
+				'api_product_id' => $this->plugin_slug
+			) ), true );
+
+			if ( ! empty( $activate_results['activated'] ) ) {
+
+				$this->api_key          = $licence_key;
+				$this->activation_email = $email;
+				$this->errors           = array();
+
+				update_option( $this->plugin_slug . '_licence_key', $this->api_key );
+				update_option( $this->plugin_slug . '_email', $this->activation_email );
+				delete_option( $this->plugin_slug . '_errors' );
+
+				return true;
+
+			} elseif ( $activate_results === false ) {
+
+				throw new Exception( 'Connection failed to the Licence Key API server. Try again later.' );
+
+			} elseif ( isset( $activate_results['error_code'] ) ) {
+
+				throw new Exception( $activate_results['error'] );
+
+			}
+
+		} catch ( Exception $e ) {
+			$this->add_error( $e->getMessage() );
+			return false;
+		}
 	}
 
 	/**
 	 * Deactivate a licence
 	 */
 	public function deactivate_licence() {
-		include_once( 'class-wpjm-updater-key-api.php' );
-
 		$reset = WPJM_Updater_Key_API::deactivate( array(
 				'api_product_id' => $this->plugin_slug,
 				'licence_key'    => $this->api_key,
@@ -232,7 +260,7 @@ class WPJM_Updater {
 	 * Action links
 	 */
 	public function action_links( $links ) {
-		$links[] = '<a href="' . add_query_arg( $this->plugin_slug . '_deactivate_licence', 1 ) . '">' . 'Deactivate licence' . '</a>';
+		$links[] = '<a href="' . remove_query_arg( array( 'deactivated_licence', 'activated_licence' ), add_query_arg( $this->plugin_slug . '_deactivate_licence', 1 ) ) . '">' . 'Deactivate licence' . '</a>';
 		return $links;
 	}
 
@@ -240,61 +268,40 @@ class WPJM_Updater {
 	 * Show a notice prompting the user to update
 	 */
 	public function key_notice() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
+		if ( sizeof( $this->errors ) === 0 && ! get_option( $this->plugin_slug . '_hide_key_notice' ) ) {
+			include( 'views/html-key-notice.php' );
 		}
-		?><div class="updated">
-			<p class="wpjm-updater-dismiss" style="float:right;"><a href="<?php echo esc_url( add_query_arg( 'dismiss-' . sanitize_title( $this->plugin_slug ), '1' ) ); ?>"><?php _e( 'Hide notice' ); ?></a></p>
-			<p><?php printf( '<a href="%s">Please enter your licence key</a> to get updates for "%s".', esc_url( admin_url( 'plugins.php#' . sanitize_title( $this->plugin_slug ) ) ), esc_html( $this->plugin_data['Name'] ) ); ?></p>
-			<p><small class="description"><?php printf( 'Lost your key? <a href="%s">Retrieve it here</a>.', esc_url( 'https://wpjobmanager.com/lost-licence-key/' ) ); ?></small></p>
-		</div><?php
 	}
 
 	/**
 	 * Activation success notice
 	 */
 	public function activated_key_notice() {
-		?><div class="updated">
-			<p><?php printf( 'Your licence for <strong>%s</strong> has been activated. Thanks!', esc_html( $this->plugin_data['Name'] ) ); ?></p>
-		</div><?php
+		include( 'views/html-activated-key.php' );
 	}
 
 	/**
 	 * Dectivation success notice
 	 */
 	public function deactivated_key_notice() {
-		?><div class="updated">
-			<p><?php printf( 'Your licence for <strong>%s</strong> has been deactivated.', esc_html( $this->plugin_data['Name'] ) ); ?></p>
-		</div><?php
+		include( 'views/html-deactivated-key.php' );
 	}
 
 	/**
 	 * Enqueue admin styles
 	 */
 	public function styles() {
-		wp_enqueue_style( 'wpjm-updater-styles', plugins_url( basename( plugin_dir_path( $this->plugin_file ) ), basename( $this->plugin_file ) ) . '/includes/updater/assets/css/admin.css' );
+		if ( ! wp_style_is( 'wpjm-updater-styles', 'enqueued' ) ) {
+			wp_enqueue_style( 'wpjm-updater-styles', plugins_url( basename( plugin_dir_path( $this->plugin_file ) ), basename( $this->plugin_file ) ) . '/includes/updater/assets/css/admin.css' );
+		}
 	}
 
 	/**
 	 * Show the input for the licence key
 	 */
 	public function key_input( $file ) {
-		if ( basename( dirname( $file ) ) === $this->plugin_slug ) {
-			?><tr id="<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key_row" class="active plugin-update-tr wpjm-updater-licence-key-tr">
-				<td class="plugin-update" colspan="3">
-					<div class="wpjm-updater-licence-key">
-						<label for="<?php echo sanitize_title( $this->plugin_slug ); ?>_licence_key"><?php _e( 'Licence' ); ?>:</label>
-						<input type="text" id="<?php echo sanitize_title( $this->plugin_slug ); ?>_licence_key" name="<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key" placeholder="Licence key" />
-						<input type="email" id="<?php echo sanitize_title( $this->plugin_slug ); ?>_email" name="<?php echo esc_attr( $this->plugin_slug ); ?>_email" placeholder="Email address" value="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" />
-						<span class="description"><?php _e( 'Enter your licence key and email and hit return. A valid key is required for automatic updates.' ); ?></span>
-					</div>
-				</td>
-				<script>
-					jQuery(function(){
-						jQuery('tr#<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key_row').prev().addClass('wpjm-updater-licenced');
-					});
-				</script>
-			</tr><?php
+		if ( strtolower( basename( dirname( $file ) ) ) === strtolower( $this->plugin_slug ) ) {
+			include( 'views/html-key-input.php' );
 		}
 	}
 
@@ -312,34 +319,10 @@ class WPJM_Updater {
 			return $check_for_updates_data;
 		}
 
-		$current_ver = $check_for_updates_data->checked[ $this->plugin_name ];
-
-		$args = array(
-			'request'        => 'pluginupdatecheck',
-			'plugin_name'    => $this->plugin_name,
-			'version'        => $current_ver,
-			'api_product_id' => $this->plugin_slug,
-			'licence_key'    => $this->api_key,
-			'email'          => $this->activation_email,
-			'instance'       => site_url()
-		);
-
-		// Check for a plugin update
-		$response = $this->plugin_information( $args );
-
-		if ( isset( $response->errors ) ) {
-			$this->handle_errors( $response->errors );
-		}
-
 		// Set version variables
-		if ( isset( $response ) && is_object( $response ) && $response !== false ) {
-			// New plugin version from the API
-			$new_ver = (string) $response->new_version;
-		}
-
-		// If there is a new version, modify the transient to reflect an update is available
-		if ( isset( $new_ver ) ) {
-			if ( $response !== false && version_compare( $new_ver, $current_ver, '>' ) ) {
+		if ( $response = $this->get_plugin_version() ) {
+			// If there is a new version, modify the transient to reflect an update is available
+			if ( $response !== false && version_compare( $response->new_version, $this->plugin_data['Version'], '>' ) ) {
 				$check_for_updates_data->response[ $this->plugin_name ] = $response;
 			}
 		}
@@ -361,22 +344,48 @@ class WPJM_Updater {
 			return $false;
 		}
 
-		// Get the current version
-		$plugin_info = get_site_transient( 'update_plugins' );
-		$current_ver = isset( $plugin_info->checked[ $this->plugin_name ] ) ? $plugin_info->checked[ $this->plugin_name ] : '';
+		if ( $response = $this->get_plugin_info() ) {
+			return $response;
+		}
+	}
 
-		$args = array(
-			'request'        => 'plugininformation',
+	/**
+	 * Get plugin version info from API
+	 * @return array|bool
+	 */
+	public function get_plugin_version() {
+		$response = WPJM_Updater_API::plugin_update_check( array(
 			'plugin_name'    => $this->plugin_name,
-			'version'        => $current_ver,
+			'version'        => $this->plugin_data['Version'],
 			'api_product_id' => $this->plugin_slug,
 			'licence_key'    => $this->api_key,
-			'email'          => $this->activation_email,
-			'instance'       => site_url()
-		);
+			'email'          => $this->activation_email
+		) );
 
-		// Check for a plugin update
-		$response = $this->plugin_information( $args );
+		if ( isset( $response->errors ) ) {
+			$this->handle_errors( $response->errors );
+		}
+
+		// Set version variables
+		if ( isset( $response ) && is_object( $response ) && $response !== false ) {
+			return $response;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get plugin info from API
+	 * @return array|bool
+	 */
+	public function get_plugin_info() {
+		$response = WPJM_Updater_API::plugin_information( array(
+			'plugin_name'    => $this->plugin_name,
+			'version'        => $this->plugin_data['Version'],
+			'api_product_id' => $this->plugin_slug,
+			'licence_key'    => $this->api_key,
+			'email'          => $this->activation_email
+		) );
 
 		if ( isset( $response->errors ) ) {
 			$this->handle_errors( $response->errors );
@@ -386,6 +395,8 @@ class WPJM_Updater {
 		if ( isset( $response ) && is_object( $response ) && $response !== false ) {
 			return $response;
 		}
+
+		return false;
 	}
 
 	/**
@@ -405,23 +416,50 @@ class WPJM_Updater {
 		}
 	}
 
-	/**
-	 * Sends and receives data to and from the server API
-	 * @return object $response
-	 */
-	public function plugin_information( $args ) {
-		$request    = wp_remote_get( $this->api_url . '&' . http_build_query( $args, '', '&' ) );
-
-		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
-			return false;
+ 	/**
+     * show update nofication row -- needed for multisite subsites, because WP won't tell you otherwise!
+     *
+     * Based on code by Pippin Williamson
+     *
+     * @param string  $file
+     * @param array   $plugin
+     */
+    public function multisite_updates( $file, $plugin ) {
+        if ( ! is_multisite() || is_network_admin() ) {
+            return;
 		}
 
-		$response = maybe_unserialize( wp_remote_retrieve_body( $request ) );
+		// Remove our filter on the site transient
+		remove_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_updates' ) );
 
-		if ( is_object( $response ) ) {
-			return $response;
+		$update_cache = get_site_transient( 'update_plugins' );
+
+		// Check if we have no version info, or every hour
+		if ( empty( $update_cache->response ) || empty( $update_cache->response[ $this->plugin_name ] ) || empty( $update_cache->last_checked ) || $update_cache->last_checked < strtotime( '-1 hour' ) ) {
+			// Get plugin version info
+			if ( $version_info = $this->get_plugin_version() ) {
+				//if ( version_compare( $this->plugin_data['Version'], $version_info->new_version, '<' ) ) {
+				$update_cache->response[ $this->plugin_name ] = $version_info;
+				//}
+				$update_cache->last_checked                  = time();
+				$update_cache->checked[ $this->plugin_name ] = $this->plugin_data['Version'];
+
+				set_site_transient( 'update_plugins', $update_cache );
+			}
 		} else {
-			return false;
+			$version_info = $update_cache->response[ $this->plugin_name ];
 		}
-	}
+
+		// Restore our filter
+		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_for_updates' ) );
+
+        if ( ! empty( $version_info->new_version ) && version_compare( $this->plugin_data['Version'], $version_info->new_version, '<' ) ) {
+
+			$wp_list_table  = _get_list_table( 'WP_Plugins_List_Table' );
+			$changelog_link = network_admin_url( 'plugin-install.php?tab=plugin-information&amp;plugin=' . $this->plugin_name . '&amp;section=changelog&amp;TB_iframe=true&amp;width=772&amp;height=597' );
+
+            include( 'views/html-ms-update.php' );
+        }
+    }
+
 }
