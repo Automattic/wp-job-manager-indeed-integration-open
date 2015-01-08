@@ -65,7 +65,7 @@ class WP_Job_Manager_Indeed_API {
 
 		if ( false === ( $results = get_transient( $transient_name ) ) ) {
 			$results = array();
-			$result  = wp_remote_get( self::$endpoint . http_build_query( $args, '', '&' ) );
+			$result  = wp_remote_get( self::$endpoint . http_build_query( $args, '', '&' ), array( 'timeout' => 10 ) );
 
 			if ( ! is_wp_error( $result ) && ! empty( $result['body'] ) ) {
 				$results = (array) json_decode( $result['body'] );
