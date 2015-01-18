@@ -74,8 +74,30 @@ module.exports = function( grunt ){
 				],
 				tasks: ['uglify']
 			}
-		},	
+		},
 
+		shell: {
+			options: {
+				stdout: true,
+				stderr: true
+			},
+			txpull: {
+				command: [
+					'tx pull -a -f',
+				].join( '&&' )
+			},
+			generatemos: {
+				command: [
+					'cd languages',
+					'for i in *.po; do msgfmt $i -o ${i%%.*}.mo; done'
+				].join( '&&' )
+			},
+			generatepot: {
+				command: [
+					'makepot'
+				].join( '&&' )
+			}
+		},
 	});
 
 	// Load NPM tasks to be used here
