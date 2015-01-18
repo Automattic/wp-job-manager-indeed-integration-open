@@ -2,7 +2,7 @@ jQuery( document ).ready( function ( $ ) {
 
 	var xhr;
 
-	$( '.job_listings' ).on( 'update_results', function ( event, page, append ) {
+	$( '.job_listings' ).on( 'update_indeed_results', function ( event, page, append ) {
 
 		if ( xhr ) {
 			xhr.abort();
@@ -72,7 +72,7 @@ jQuery( document ).ready( function ( $ ) {
 
 		$( this ).data( 'page', ( page + 1 ) );
 
-		target.triggerHandler( 'update_results', [ page + 1, true ] );
+		target.triggerHandler( 'update_indeed_results', [ page + 1, true ] );
 
 		return false;
 	} );

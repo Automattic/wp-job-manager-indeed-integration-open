@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WP_Job_Manager_Indeed_Export {
 
 	/**
-	 * __construct function.
+	 * Constructor
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'add_jobs_feed' ) );
@@ -25,11 +25,10 @@ class WP_Job_Manager_Indeed_Export {
 	 */
 	public static function template_loader() {
 		global $wp_query;
-		
 		get_job_manager_template( 'indeed-job-feed.php', array(), 'job_manager_indeed_integration', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
 		exit();
 	}
-	
+
 	/**
 	 * Create the jobs custom feed
 	 *

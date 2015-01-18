@@ -3,7 +3,7 @@
 Plugin Name: WP Job Manager - Indeed Integration
 Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
 Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
-Version: 2.0.18
+Version: 2.1.0
 Author: Mike Jolley
 Author URI: http://mikejolley.com
 Requires at least: 3.8
@@ -19,50 +19,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Updater
 if ( ! class_exists( 'WPJM_Updater' ) ) {
 	include( 'includes/updater/class-wpjm-updater.php' );
+}
+
+// Import Framework
+if ( ! class_exists( 'WP_Job_Manager_Importer_Integration' ) ) {
+	include_once( 'includes/import-framework/class-wp-job-manager-importer-integration.php' );
 }
 
 /**
  * WP_Job_Manager_Indeed_Integration class.
  */
-class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
+class WP_Job_Manager_Indeed_Integration {
 
 	/**
 	 * __construct function.
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '2.0.18' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '2.1.0' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
 		// Add actions
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ), 12 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 5 );
 		add_filter( 'job_manager_settings', array( $this, 'settings' ) );
 		add_action( 'admin_footer-job_listing_page_job-manager-settings', array( $this, 'settings_js' ) );
+		add_action( 'job_manager_imported_jobs_start', array( $this, 'add_attribution' ) );
 
 		// Includes
-		if ( get_option( 'job_manager_indeed_enable_backfill', 1 ) == 1 ) {
-			include_once( 'includes/class-wp-job-manager-indeed-import.php' );
-		}
+		include_once( 'includes/class-wp-job-manager-indeed-import.php' );
+		include_once( 'includes/class-wp-job-manager-indeed-api.php' );
+		include_once( 'includes/class-wp-job-manager-indeed-shortcode.php' );
 
-		if ( get_option( 'job_manager_indeed_enable_feed', 1 ) == 1 ) {
+		if ( get_option( 'job_manager_indeed_enable_feed', 1 ) ) {
 			include_once( 'includes/class-wp-job-manager-indeed-export.php' );
 		}
 
 		// Install and uninstall
 		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
 		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
-
-		// Init updates
-		$this->init_updates( __FILE__ );
 	}
-
-	/**
-	 * Runs on de-activation
-	 */
-	public function deactivate() {}
 
 	/**
 	 * Localisation
@@ -71,6 +71,13 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 		$locale = apply_filters( 'plugin_locale', get_locale(), 'wp-job-manager-indeed-integration' );
 		load_textdomain( 'wp-job-manager-indeed-integration', WP_LANG_DIR . "/wp-job-manager-indeed-integration/wp-job-manager-indeed-integration-$locale.mo" );
 		load_plugin_textdomain( 'wp-job-manager-indeed-integration', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+	}
+
+	/**
+	 * Enqueue scripts
+	 */
+	public function wp_enqueue_scripts() {
+		wp_register_script( 'indeed-click-tracking', '//gdc.indeed.com/ads/apiresults.js', array(), JOB_MANAGER_INDEED_VERSION, true );
 	}
 
 	/**
@@ -188,15 +195,6 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 					),
 
 					array(
-						'name' 		=> 'job_manager_indeed_show_attribution',
-						'std' 		=> 1,
-						'label' 	=> __( 'Attribution', 'wp-job-manager-indeed-integration' ),
-						'cb_label' 	=> __( 'Automatically show attribution', 'wp-job-manager-indeed-integration' ),
-						'desc'		=> __( 'Indeed require attribution when including their listings. Enable this to automatically display the attribution image.', 'wp-job-manager-indeed-integration' ),
-						'type'      => 'checkbox'
-					),
-
-					array(
 						'name' 		=> 'job_manager_indeed_search_title_only',
 						'std' 		=> 1,
 						'label' 	=> __( 'Query titles', 'wp-job-manager-indeed-integration' ),
@@ -230,6 +228,16 @@ class WP_Job_Manager_Indeed_Integration extends WPJM_Updater {
 		</script>
 		<?php
 	}
+
+	/**
+	 * Add attribution
+	 */
+	public function add_attribution( $source ) {
+		if ( 'indeed' === $source && apply_filters( 'job_manager_indeed_show_attribution', true ) ) {
+			get_job_manager_template_part( 'content', 'attribution', 'indeed', JOB_MANAGER_INDEED_PLUGIN_DIR . '/templates/' );
+		}
+	}
 }
 
-$GLOBALS['wp-job-manager-indeed-integration'] = new WP_Job_Manager_Indeed_Integration();
+new WP_Job_Manager_Indeed_Integration();
+new WPJM_Updater( __FILE__ );
