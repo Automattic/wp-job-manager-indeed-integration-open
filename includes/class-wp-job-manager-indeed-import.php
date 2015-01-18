@@ -19,7 +19,15 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 	public function __construct() {
 		if ( get_option( 'job_manager_indeed_enable_backfill', 1 ) ) {
 			WP_Job_Manager_Importers::register_importer( $this->importer_id, $this );
+			add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 		}
+	}
+
+	/**
+	 * Enqueue scripts
+	 */
+	public function wp_enqueue_scripts() {
+		wp_enqueue_script( 'indeed-click-tracking' );
 	}
 
 	/**
