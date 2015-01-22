@@ -28,6 +28,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 	 */
 	public function wp_enqueue_scripts() {
 		wp_enqueue_script( 'indeed-click-tracking' );
+		wp_enqueue_style( 'job-manager-indeed', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/css/frontend.css' );
 	}
 
 	/**
@@ -115,7 +116,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 
 		return WP_Job_Manager_Indeed_API::get_jobs( array(
 			'sort'  => 'relevance',
-			'q'     => $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_keywords' ),
+			'q'     => $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_query' ),
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
 			'jt'    => $type,
