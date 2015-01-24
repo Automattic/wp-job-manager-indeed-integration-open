@@ -85,7 +85,7 @@ class WP_Job_Manager_Indeed_API {
 	 * @return array()
 	 */
 	public static function get_jobs( $args ) {
-		$args           = self::format_args( wp_parse_args( $args, self::get_default_args() ) );
+		$args           = self::format_args( apply_filters( 'job_manager_indeed_get_jobs_args', wp_parse_args( $args, self::get_default_args() ) ) );
 		$transient_name = 'indeed_' . md5( json_encode( $args ) );
 		$total_pages    = 0;
 		$total_jobs     = 0;
