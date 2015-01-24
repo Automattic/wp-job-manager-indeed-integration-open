@@ -97,6 +97,9 @@ class WP_Job_Manager_Indeed_API {
 
 			if ( ! is_wp_error( $result ) && ! empty( $result['body'] ) ) {
 				$results = json_decode( $result['body'], true );
+				if ( empty( $results['results'] ) ) {
+					return self::response(); // No results - don't cache
+				}
 				set_transient( $transient_name, $results, ( 60 * 60 * 24 ) );
 			}
 		}
