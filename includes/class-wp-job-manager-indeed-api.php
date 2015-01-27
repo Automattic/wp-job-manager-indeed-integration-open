@@ -152,10 +152,10 @@ class WP_Job_Manager_Indeed_API {
 			'title'           => sanitize_text_field( $raw_job['jobtitle'] ),
 			'company'         => sanitize_text_field( $raw_job['company'] ),
 			'tagline'         => sprintf( __( 'Source: %s', 'wp-job-manager-indeed-integration' ), $raw_job['source'] ),
-			'permalink'       => esc_url_raw( $raw_job['url'] ),
+			'url'             => esc_url_raw( $raw_job['url'] ),
 			'location'        => sanitize_text_field( $raw_job['formattedLocation'] ),
-			'lat'             => isset( $raw_job['latitude'] ) ? sanitize_text_field( $raw_job['latitude'] ) : '',
-			'lng'             => isset( $raw_job['longitude'] ) ? sanitize_text_field( $raw_job['longitude'] ) : '',
+			'latitude'        => isset( $raw_job['latitude'] ) ? sanitize_text_field( $raw_job['latitude'] ) : '',
+			'longitude'       => isset( $raw_job['longitude'] ) ? sanitize_text_field( $raw_job['longitude'] ) : '',
 			'timestamp'       => strtotime( $raw_job['date'] ),
 			'link_attributes' => array(
 				'onmousedown' => sanitize_text_field( $raw_job['onmousedown'] )

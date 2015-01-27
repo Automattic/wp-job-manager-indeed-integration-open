@@ -12,7 +12,9 @@ class WP_Job_Manager_Indeed_Export {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'add_jobs_feed' ) );
+		if ( get_option( 'job_manager_indeed_enable_feed', 1 ) ) {
+			add_action( 'init', array( $this, 'add_jobs_feed' ) );
+		}
 	}
 
 	/**

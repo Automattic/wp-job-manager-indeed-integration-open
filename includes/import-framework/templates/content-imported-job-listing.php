@@ -1,13 +1,13 @@
-<li class="<?php echo esc_attr( $source ); ?>_job_listing job_listing" data-longitude="<?php echo esc_attr( $job->lng ); ?>" data-latitude="<?php echo esc_attr( $job->lat ); ?>">
-	<a href="<?php echo esc_url( $job->permalink ); ?>" <?php foreach ( $job->link_attributes as $key => $value ) echo esc_attr( $key ) . '="' . esc_attr( $value ) . '"'; ?> target="_blank">
+<li class="<?php echo esc_attr( $source ); ?>_job_listing job_listing" data-longitude="<?php echo esc_attr( $job->longitude ); ?>" data-latitude="<?php echo esc_attr( $job->latitude ); ?>">
+	<a href="<?php echo esc_url( $job->url ); ?>" target="_blank" <?php echo $link_attributes; ?>>
 
-		<img class="company_logo" src="<?php echo esc_url( apply_filters( 'job_manager_default_company_logo', JOB_MANAGER_PLUGIN_URL . '/assets/images/company.png' ) ); ?>" alt="Logo" />
+		<img class="company_logo" src="<?php echo esc_url( $logo ); ?>" alt="Logo" />
 
 		<div class="position">
 			<h3><?php echo esc_html( $job->title ); ?></h3>
 			<div class="company">
 				<strong><?php echo esc_html( $job->company ); ?></strong>
-				<small class="tagline"><?php echo esc_html( trim( $job->tagline ) ); ?></small>
+				<small class="tagline"><?php echo esc_html( $job->tagline ); ?></small>
 			</div>
 		</div>
 

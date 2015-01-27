@@ -111,12 +111,21 @@ class WP_Job_Manager_Importer_Integration {
 
 		if ( $jobs ) {
 			do_action( 'job_manager_imported_jobs_start', $source );
+
 			foreach ( $jobs as $job ) {
+				// Prepare 'a' args
+				$link_attributes = array();
+				foreach ( $job->link_attributes as $key => $value ) {
+					$link_attributes[] = esc_attr( $key ) . '="' . esc_attr( $value ) . '"';
+				}
 				get_job_manager_template( 'content-imported-job-listing.php', $args = array(
-					'source' => $source,
-					'job'    => $job
+					'source'          => $source,
+					'job'             => $job,
+					'logo'            => apply_filters( 'job_manager_default_company_logo', JOB_MANAGER_PLUGIN_URL . '/assets/images/company.png' ),
+					'link_attributes' => implode( ' ', $link_attributes )
 				), $source, dirname( __FILE__ ) . '/templates/' );
 			}
+
 			do_action( 'job_manager_imported_jobs_end', $source );
 		}
 
