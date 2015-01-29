@@ -120,6 +120,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
 			'jt'    => $type,
+			'limit' => $limit,
 			'start' => max( 25, $limit ) * ( $page - 1 )
 		) );
 	}
