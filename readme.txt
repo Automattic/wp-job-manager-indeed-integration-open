@@ -2,7 +2,7 @@
 Contributors: mikejolley
 Requires at least: 3.8
 Tested up to: 4.1
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GNU General Public License v3.0
 
 Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
@@ -28,6 +28,9 @@ If you need help with customisation you will need to find and hire a developer c
 To install this plugin, please refer to the guide here: [http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation)
 
 == Changelog ==
+
+= 2.1.3 =
+* Support 'GET'.
 
 = 2.1.2 =
 * Fix import limit.

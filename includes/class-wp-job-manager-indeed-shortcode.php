@@ -36,9 +36,9 @@ class WP_Job_Manager_Indeed_Shortcode {
 		add_filter( 'job_manager_indeed_show_attribution', '__return_false' );
 
 		$api_args          = array();
-		$page              = absint( $_POST['page'] );
+		$page              = absint( $_REQUEST['page'] );
 
-		foreach ( (array) $_POST['api_args'] as $key => $value ) {
+		foreach ( (array) $_REQUEST['api_args'] as $key => $value ) {
 			$api_args[ $key ] = sanitize_text_field( $value );
 		}
 

@@ -1,7 +1,7 @@
 <li class="<?php echo esc_attr( $source ); ?>_job_listing job_listing" data-longitude="<?php echo esc_attr( $job->longitude ); ?>" data-latitude="<?php echo esc_attr( $job->latitude ); ?>">
 	<a href="<?php echo esc_url( $job->url ); ?>" target="_blank" <?php echo $link_attributes; ?>>
 
-		<img class="company_logo" src="<?php echo esc_url( $logo ); ?>" alt="Logo" />
+		<img class="company_logo" src="<?php echo esc_url( $job->logo ); ?>" alt="Logo" />
 
 		<div class="position">
 			<h3><?php echo esc_html( $job->title ); ?></h3>

@@ -40,7 +40,7 @@ class WP_Job_Manager_Importer_Integration {
 	 * @return array
 	 */
 	public static function inject_jobs( $result ) {
-		$page          = absint( isset( $_POST['page'] ) ? $_POST['page'] : 1 );
+		$page          = absint( isset( $_REQUEST['page'] ) ? $_REQUEST['page'] : 1 );
 		$offset_before = false;
 
 		if ( 1 === $page ) {
@@ -78,7 +78,7 @@ class WP_Job_Manager_Importer_Integration {
 	 * @return array
 	 */
 	public static function backfill_jobs( $result ) {
-		$page          = absint( isset( $_POST['page'] ) ? $_POST['page'] : 1 );
+		$page          = absint( isset( $_REQUEST['page'] ) ? $_REQUEST['page'] : 1 );
 		$max_page      = 0;
 		$backfill_html = '';
 
@@ -95,7 +95,7 @@ class WP_Job_Manager_Importer_Integration {
 			$result['found_jobs']    = true;
 			$result['html']          = $backfill_html;
 			$result['max_num_pages'] = $max_page;
-			$result['pagination']    = get_job_listing_pagination( $result['max_num_pages'], absint( $_POST['page'] ) );
+			$result['pagination']    = get_job_listing_pagination( $result['max_num_pages'], absint( $_REQUEST['page'] ) );
 		}
 
 		return $result;
@@ -121,7 +121,7 @@ class WP_Job_Manager_Importer_Integration {
 				get_job_manager_template( 'content-imported-job-listing.php', $args = array(
 					'source'          => $source,
 					'job'             => $job,
-					'logo'            => apply_filters( 'job_manager_default_company_logo', JOB_MANAGER_PLUGIN_URL . '/assets/images/company.png' ),
+					'logo'            =>  apply_filters( 'job_manager_default_company_logo', JOB_MANAGER_PLUGIN_URL . '/assets/images/company.png' ),
 					'link_attributes' => implode( ' ', $link_attributes )
 				), $source, dirname( __FILE__ ) . '/templates/' );
 			}

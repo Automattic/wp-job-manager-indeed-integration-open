@@ -151,6 +151,7 @@ class WP_Job_Manager_Indeed_API {
 		$job = array(
 			'title'           => sanitize_text_field( $raw_job['jobtitle'] ),
 			'company'         => sanitize_text_field( $raw_job['company'] ),
+			'logo'            => apply_filters( 'job_manager_default_company_logo', JOB_MANAGER_PLUGIN_URL . '/assets/images/company.png' ),
 			'tagline'         => sprintf( __( 'Source: %s', 'wp-job-manager-indeed-integration' ), $raw_job['source'] ),
 			'url'             => esc_url_raw( $raw_job['url'] ),
 			'location'        => sanitize_text_field( $raw_job['formattedLocation'] ),

@@ -20,7 +20,7 @@ jQuery( document ).ready( function ( $ ) {
 		$( '.load_more_indeed_jobs', target ).addClass( 'loading' );
 
 		xhr = $.ajax( {
-			type: 'POST',
+			type: 'GET',
 			url: job_manager_indeed_jobs.ajax_url,
 			data: data,
 			success: function ( response ) {

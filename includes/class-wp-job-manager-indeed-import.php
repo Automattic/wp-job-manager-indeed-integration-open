@@ -56,14 +56,14 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 		}
 
 		$types            = get_job_listing_types();
-		$filter_job_types = array_filter( array_map( 'sanitize_title', (array) $_POST['filter_job_type'] ) );
-		$search_location  = sanitize_text_field( stripslashes( $_POST['search_location'] ) );
-		$search_keywords  = sanitize_text_field( stripslashes( $_POST['search_keywords'] ) );
+		$filter_job_types = array_filter( array_map( 'sanitize_title', (array) $_REQUEST['filter_job_type'] ) );
+		$search_location  = sanitize_text_field( stripslashes( $_REQUEST['search_location'] ) );
+		$search_keywords  = sanitize_text_field( stripslashes( $_REQUEST['search_keywords'] ) );
 		$page             = $offset_before ? $page + 1 : $page;
 
 		// Category
 		$categories        = array();
-		$search_categories = isset( $_POST['search_categories'] ) ? array_filter( array_map( 'absint', (array) $_POST['search_categories'] ) ) : array();
+		$search_categories = isset( $_REQUEST['search_categories'] ) ? array_filter( array_map( 'absint', (array) $_REQUEST['search_categories'] ) ) : array();
 		if ( ! empty( $search_categories ) ) {
 			foreach ( $search_categories as $term_id ) {
 				$term         = get_term_by( 'id', absint( $term_id ), 'job_listing_category' );
@@ -72,8 +72,8 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 		}
 
 		// Regions integration
-		if ( isset( $_POST['form_data'] ) && taxonomy_exists( 'job_listing_region' ) ) {
-			parse_str( $_POST['form_data'], $post_data );
+		if ( isset( $_REQUEST['form_data'] ) && taxonomy_exists( 'job_listing_region' ) ) {
+			parse_str( $_REQUEST['form_data'], $post_data );
 			if ( ! empty( $post_data['search_region'] ) ) {
 				$term = get_term_by( 'id', absint( $post_data['search_region'] ), 'job_listing_region' );
 				$search_location = $term->name;
