@@ -47,7 +47,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 				$limit = get_option( 'job_manager_indeed_per_page' );
 			break;
 			case "after" :
-				$limit = get_option( 'job_manager_indeed_before_jobs' );
+				$limit = get_option( 'job_manager_indeed_after_jobs' );
 			break;
 		}
 
