@@ -51,7 +51,7 @@ class WP_Job_Manager_Indeed_API {
 	 * @param  string $keyword
 	 * @return string
 	 */
-	public static function format_arg_keyword( $keyword ) {
+	public static function format_arg_q( $keyword ) {
 		if ( get_option( 'job_manager_indeed_search_title_only', 1 ) ) {
 			$keyword = 'title:(' . $keyword . ')';
 		}
