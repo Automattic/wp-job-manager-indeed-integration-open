@@ -31,6 +31,7 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 = 2.1.5 =
 * Fix - Keyword filter.
+* Sort results based on orderby arg.
 
 = 2.1.4 =
 * Fix - job_manager_indeed_after_jobs.

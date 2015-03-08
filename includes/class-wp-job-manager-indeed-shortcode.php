@@ -44,6 +44,12 @@ class WP_Job_Manager_Indeed_Shortcode {
 
 		$api_args['start'] = $api_args['start'] + ( max( 25, $api_args['limit'] ) * ( $page - 1 ) );
 
+		if ( ! empty( $_REQUEST['orderby'] ) && 'date' === $_REQUEST['orderby'] ) {
+			$api_args['sort'] = 'date';
+		} else {
+			$api_args['sort'] = 'relevance';
+		}
+
 		if ( ( $jobs = WP_Job_Manager_Indeed_API::get_jobs( $api_args ) ) && $jobs['jobs'] ) {
 			echo WP_Job_Manager_Importer_Integration::get_jobs_html( $jobs['jobs'], 'indeed' );
 		}
