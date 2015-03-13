@@ -55,14 +55,14 @@ class WP_Job_Manager_Importer_Integration {
 
 		if ( $page == $result['max_num_pages'] ) {
 			foreach ( WP_Job_Manager_Importers::get_registered_importers() as $key => $importer ) {
-				$jobs               = $importer->get_jobs_for_request( $page, 'page', $offset_before );
+				$jobs               = $importer->get_jobs_for_request( $page, 'after', $offset_before );
 				if ( $jobs['jobs'] ) {
 					$result['html'] = $result['html'] . self::get_jobs_html( $jobs['jobs'], $key );
 				}
 			}
 		} elseif ( $page > 1 && $page != $result['max_num_pages'] ) {
 			foreach ( WP_Job_Manager_Importers::get_registered_importers() as $key => $importer ) {
-				$jobs               = $importer->get_jobs_for_request( $page, 'after', $offset_before );
+				$jobs               = $importer->get_jobs_for_request( $page, 'page', $offset_before );
 				if ( $jobs['jobs'] ) {
 					$result['html'] = $result['html'] . self::get_jobs_html( $jobs['jobs'], $key );
 				}

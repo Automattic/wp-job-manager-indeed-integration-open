@@ -29,6 +29,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+* Fix - Page offset.
+
 = 2.1.6 =
 * Fix results when no keyword is specified.
 

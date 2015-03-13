@@ -55,6 +55,10 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 			return WP_Job_Manager_Indeed_API::response();
 		}
 
+		if ( $limit > 25 ) {
+			$limit = 25;
+		}
+
 		$types            = get_job_listing_types();
 		$filter_job_types = array_filter( array_map( 'sanitize_title', (array) $_REQUEST['filter_job_type'] ) );
 		$search_location  = sanitize_text_field( stripslashes( $_REQUEST['search_location'] ) );
@@ -121,7 +125,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 			'co'    => $search_country,
 			'jt'    => $type,
 			'limit' => $limit,
-			'start' => max( 25, $limit ) * ( $page - 1 )
+			'start' => $limit * ( $page - 1 )
 		) );
 	}
 }
