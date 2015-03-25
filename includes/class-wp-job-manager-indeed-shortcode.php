@@ -46,7 +46,7 @@ class WP_Job_Manager_Indeed_Shortcode {
 
 		if ( ! empty( $_REQUEST['orderby'] ) && 'date' === $_REQUEST['orderby'] ) {
 			$api_args['sort'] = 'date';
-		} else {
+		} elseif ( ! empty( $_REQUEST['orderby'] ) ) {
 			$api_args['sort'] = 'relevance';
 		}
 
