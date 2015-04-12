@@ -17,7 +17,7 @@
 
 		<ul class="meta">
 			<li class="job-type <?php echo esc_attr( $job->type_slug ); ?>"><?php echo esc_html( $job->type ); ?></li>
-			<li class="date"><date><?php printf( __( 'Posted %s ago', 'wp-job-manager' ), human_time_diff( $job->timestamp, current_time( 'timestamp' ) ) ); ?></date></li>
+			<li class="date"><date><?php printf( __( '%s ago', 'wp-job-manager' ), human_time_diff( $job->timestamp, current_time( 'timestamp' ) ) ); ?></date></li>
 		</ul>
 	</a>
 </li>
