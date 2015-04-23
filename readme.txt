@@ -29,6 +29,8 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+* job_manager_indeed_geolocate_country filter.
+
 = 2.1.8 =
 * Fix - Sort param.
 

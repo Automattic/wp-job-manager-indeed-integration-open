@@ -111,7 +111,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 		// Before querying indeed, lets ensure the CO variable matches the location by using google geocoding
 		$search_country = get_option( 'job_manager_indeed_default_country' );
 
-		if ( $search_location ) {
+		if ( $search_location && apply_filters( 'job_manager_indeed_geolocate_country', true ) ) {
 			$address_data = WP_Job_Manager_Geocode::get_location_data( $search_location );
 			if ( ! empty( $address_data['country_short'] ) ) {
 				$search_country = $address_data['country_short'];
