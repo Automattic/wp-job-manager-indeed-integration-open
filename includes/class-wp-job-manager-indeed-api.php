@@ -76,6 +76,9 @@ class WP_Job_Manager_Indeed_API {
 			case 'contract' :
 				$type = 'freelance';
 			break;
+			case 'all' :
+				$type = '';
+			break;
 		}
 		return $type;
 	}
@@ -106,14 +109,17 @@ class WP_Job_Manager_Indeed_API {
 
 		if ( $results && ! empty( $results['results'] ) ) {
 			foreach ( $results['results'] as $result ) {
-				$job = self::format_job( $result );
+				$job            = self::format_job( $result );
 				$job->type_slug = self::get_mapped_job_type( $args['jt'] );
+				$job->type      = '';
 
-				$term = get_term_by( 'slug', $job->type_slug, 'job_listing_type' );
-				if ( $term && ! is_wp_error( $term ) ) {
-					$job->type = $term->name;
-				} else {
-					$job->type = __( $job->type_slug, 'wp-job-manager-indeed-integration' );
+				if ( $job->type_slug ) {
+					$term = get_term_by( 'slug', $job->type_slug, 'job_listing_type' );
+					if ( $term && ! is_wp_error( $term ) ) {
+						$job->type = $term->name;
+					} else {
+						$job->type = __( $job->type_slug, 'wp-job-manager-indeed-integration' );
+					}
 				}
 
 				$jobs[] = $job;
