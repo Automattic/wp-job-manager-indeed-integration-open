@@ -340,7 +340,7 @@ class WPJM_Updater {
 			return $false;
 		}
 
-		if ( ! isset( $args->slug ) || ( $args->slug !== $this->plugin_name ) ) {
+		if ( ! isset( $args->slug ) || ( $args->slug !== $this->plugin_slug ) ) {
 			return $false;
 		}
 
