@@ -7,7 +7,7 @@ License: GNU General Public License v3.0
 
 Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
 
-Uses https://ads.indeed.com/jobroll/xmlfeed and http://www.indeed.com/intl/en/xmlinfo.html
+Uses http://www.indeed.com/publisher and http://www.indeed.com/intl/en/xmlinfo.html
 
 = Documentation =
 

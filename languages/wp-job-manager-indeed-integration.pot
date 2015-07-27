@@ -145,7 +145,7 @@ msgid "Default country"
 msgstr ""
 
 #: wp-job-manager-indeed-integration.php:164
-msgid "Choose a default country to show jobs from. See https://ads.indeed.com/jobroll/xmlfeed for the full list of supported country codes."
+msgid "Choose a default country to show jobs from. See http://www.indeed.com/worldwide for the full list of supported country codes."
 msgstr ""
 
 #: wp-job-manager-indeed-integration.php:171

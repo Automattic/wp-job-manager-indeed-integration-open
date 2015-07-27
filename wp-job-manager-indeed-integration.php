@@ -159,7 +159,7 @@ class WP_Job_Manager_Indeed_Integration {
 						'name' 		=> 'job_manager_indeed_default_country',
 						'std' 		=> 'us',
 						'label' 	=> __( 'Default country', 'wp-job-manager-indeed-integration' ),
-						'desc'		=> __( 'Choose a default country to show jobs from. See https://ads.indeed.com/jobroll/xmlfeed for the full list of supported country codes.', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Choose a default country to show jobs from. See http://www.indeed.com/worldwide for the full list of supported country codes.', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 
