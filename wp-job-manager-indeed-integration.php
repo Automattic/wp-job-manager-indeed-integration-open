@@ -3,11 +3,11 @@
 Plugin Name: WP Job Manager - Indeed Integration
 Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
 Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
-Version: 2.1.9
+Version: 2.1.10
 Author: Mike Jolley
 Author URI: http://mikejolley.com
 Requires at least: 3.8
-Tested up to: 4.1
+Tested up to: 4.3
 
 	Copyright: 2013 Mike Jolley
 	License: GNU General Public License v3.0
@@ -39,7 +39,7 @@ class WP_Job_Manager_Indeed_Integration {
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '2.1.9' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '2.1.10' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
@@ -103,6 +103,14 @@ class WP_Job_Manager_Indeed_Integration {
 						'cb_label' 	=> __( 'Enable Indeed XML feed.', 'wp-job-manager-indeed-integration' ),
 						'desc'		=> sprintf( __( 'The generated feed can be used to submit jobs to Indeed (see <a href="http://www.indeed.com/intl/en/xmlinfo.html">here</a>). Your feed will be found at: %s', 'wp-job-manager-indeed-integration' ), '<a href="' . home_url( '/indeed-job-feed/' ) . '">' . home_url( '/indeed-job-feed/' ) . '</a>' ),
 						'type'      => 'checkbox'
+					),
+
+					array(
+						'name' 		=> 'job_manager_indeed_feed_limit',
+						'std' 		=> '150',
+						'label' 	=> __( 'XML Feed Job Limit', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enter how many jobs should be listed in your feed maximum. Leave blank to show all (if the server has enough memory/resources).', 'wp-job-manager-indeed-integration' ),
+						'type'      => 'input'
 					),
 
 					array(
@@ -215,6 +223,17 @@ class WP_Job_Manager_Indeed_Integration {
 			jQuery('input#setting-job_manager_indeed_enable_backfill').change(function() {
 
 				var $options = jQuery('#setting-job_manager_indeed_site_type, #setting-job_manager_indeed_default_query, #setting-job_manager_indeed_default_location, #setting-job_manager_indeed_default_type, #setting-job_manager_indeed_default_country, #setting-job_manager_indeed_backfill, #setting-job_manager_indeed_before_jobs, #setting-job_manager_indeed_after_jobs, #setting-job_manager_indeed_per_page, #setting-job_manager_indeed_show_attribution');
+
+				if ( jQuery(this).is(':checked') ) {
+					$options.closest('tr').show();
+				} else {
+					$options.closest('tr').hide();
+				}
+
+			}).change();
+			jQuery('input#setting-job_manager_indeed_enable_feed').change(function() {
+
+				var $options = jQuery('#setting-job_manager_indeed_feed_limit');
 
 				if ( jQuery(this).is(':checked') ) {
 					$options.closest('tr').show();

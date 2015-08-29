@@ -26,9 +26,10 @@ $root->appendChild( $publisherurl );
 /**
  * Define Query Arguments
 */
-$args = array(
+$limit = get_option( 'job_manager_indeed_feed_limit', '150' );
+$args  = array(
 	'post_type'      => 'job_listing',
-	'posts_per_page' => -1,
+	'posts_per_page' => empty( $limit ) ? '-1' : absint( $limit ),
 	'post_status'    => 'publish',
 	'orderby'        => 'date',
 	'order'          => 'DESC',
