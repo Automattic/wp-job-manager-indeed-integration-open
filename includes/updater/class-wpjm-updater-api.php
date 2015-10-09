@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WPJM_Updater_API {
 
-	private static $api_url = 'https://wpjobmanager.com/?wc-api=wp_plugin_licencing_update_api';
+	private static $api_url = 'http://wpjobmanager.com/?wc-api=wp_plugin_licencing_update_api';
 
 	/**
 	 * Sends and receives data to and from the server API

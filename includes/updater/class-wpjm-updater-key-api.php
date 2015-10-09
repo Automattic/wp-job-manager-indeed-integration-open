@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * WPJM_Updater_Key_API
  */
 class WPJM_Updater_Key_API {
-	private static $endpoint = 'https://wpjobmanager.com/?wc-api=wp_plugin_licencing_activation_api';
+	private static $endpoint = 'http://wpjobmanager.com/?wc-api=wp_plugin_licencing_activation_api';
 
 	/**
 	 * Attempt to activate a plugin licence
