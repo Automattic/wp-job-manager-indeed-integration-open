@@ -81,23 +81,32 @@ module.exports = function( grunt ){
 				stdout: true,
 				stderr: true
 			},
-			txpull: {
-				command: [
-					'tx pull -a -f',
-				].join( '&&' )
-			},
-			generatemos: {
-				command: [
-					'cd languages',
-					'for i in *.po; do msgfmt $i -o ${i%%.*}.mo; done'
-				].join( '&&' )
-			},
 			generatepot: {
 				command: [
 					'makepot'
 				].join( '&&' )
 			}
 		},
+
+		copy: {
+			deploy: {
+				src: [
+					'**',
+					'!Gruntfile.js',
+					'!package.json',
+					'!node_modules/**'
+				],
+				dest: 'wp-job-manager-indeed-integration',
+				expand: true
+			},
+		},
+
+		clean: {
+			deploy: {
+				src: [ 'wp-job-manager-indeed-integration' ]
+			},
+		},
+
 	});
 
 	// Load NPM tasks to be used here
@@ -106,6 +115,8 @@ module.exports = function( grunt ){
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
+	grunt.loadNpmTasks( 'grunt-contrib-copy' );
+	grunt.loadNpmTasks( 'grunt-contrib-clean' );
 
 	// Register tasks
 	grunt.registerTask( 'default', [
@@ -117,6 +128,11 @@ module.exports = function( grunt ){
 	// Just an alias for pot file generation
 	grunt.registerTask( 'pot', [
 		'shell:generatepot'
+	]);
+
+	grunt.registerTask( 'deploy', [
+		'clean:deploy',
+		'copy:deploy'
 	]);
 
 };
