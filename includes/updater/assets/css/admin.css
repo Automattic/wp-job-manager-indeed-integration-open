@@ -29,3 +29,11 @@
 	border-left: 4px solid #2ea2cc !important;
 	padding: 0 !important;
 }
+.wpjm-updater-licence-key-tr .wpjm-updater-licence-key-error {
+	margin: 6px 12px 12px !important;
+	padding: 6px 12px !important;
+	line-height: 27px !important;
+}
+.wpjm-updater-licence-key-tr .wpjm-updater-licence-key-error p {
+	margin: 0 !important;
+}

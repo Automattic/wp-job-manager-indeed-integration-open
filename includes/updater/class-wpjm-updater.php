@@ -97,14 +97,7 @@ class WPJM_Updater {
 	private function activate_licence_request() {
 		$licence_key = sanitize_text_field( $_POST[ $this->plugin_slug . '_licence_key' ] );
 		$email       = sanitize_text_field( $_POST[ $this->plugin_slug . '_email' ] );
-
-		if ( $this->activate_licence( $licence_key, $email ) ) {
-			wp_redirect( remove_query_arg( array( 'deactivated_licence', $this->plugin_slug . '_deactivate_licence' ), add_query_arg( 'activated_licence', $this->plugin_slug ) ) );
-			exit;
-		} else {
-			wp_redirect( remove_query_arg( array( 'activated_licence', 'deactivated_licence', $this->plugin_slug . '_deactivate_licence' ) ) );
-			exit;
-		}
+		$this->activate_licence( $licence_key, $email );
 	}
 
 	/**
@@ -119,8 +112,7 @@ class WPJM_Updater {
 			add_action( 'after_plugin_row_' . $this->plugin_name, array( $this, 'multisite_updates' ), 10, 2 );
 			add_filter( 'plugin_action_links_' . $this->plugin_name, array( $this, 'action_links' ) );
 		}
-
-		$this->add_notice( array( $this, 'error_notices' ) );
+		add_action( 'admin_notices', array( $this, 'error_notices' ) );
 	}
 
 	/**
@@ -170,7 +162,7 @@ class WPJM_Updater {
 		if ( ! empty( $this->errors ) ) {
 			foreach ( $this->errors as $key => $error ) {
 				include( 'views/html-error-notice.php' );
-				if ( $key !== 'invalid_key' ) {
+				if ( $key !== 'invalid_key' && did_action( 'all_admin_notices' ) ) {
 					unset( $this->errors[ $key ] );
 				}
 			}
@@ -196,12 +188,13 @@ class WPJM_Updater {
 	 */
 	public function activate_licence( $licence_key, $email ) {
 		try {
+
 			if ( empty( $licence_key ) ) {
 				throw new Exception( 'Please enter your licence key' );
 			}
 
 			if ( empty( $email ) ) {
-				throw new Exception( 'Please enter the email address associated with your licence' );
+				throw new Exception( 'Please enter the email address associated with your license' );
 			}
 
 			$activate_results = json_decode( WPJM_Updater_Key_API::activate( array(
@@ -210,8 +203,13 @@ class WPJM_Updater {
 				'api_product_id' => $this->plugin_slug
 			) ), true );
 
-			if ( ! empty( $activate_results['activated'] ) ) {
+			if ( false === $activate_results ) {
+				throw new Exception( 'Connection failed to the License Key API server - possible server issue.' );
 
+			} elseif ( isset( $activate_results['error_code'] ) ) {
+				throw new Exception( $activate_results['error'] );
+
+			} elseif ( ! empty( $activate_results['activated'] ) ) {
 				$this->api_key          = $licence_key;
 				$this->activation_email = $email;
 				$this->errors           = array();
@@ -221,16 +219,9 @@ class WPJM_Updater {
 				delete_option( $this->plugin_slug . '_errors' );
 
 				return true;
-
-			} elseif ( $activate_results === false ) {
-
-				throw new Exception( 'Connection failed to the Licence Key API server. Try again later.' );
-
-			} elseif ( isset( $activate_results['error_code'] ) ) {
-
-				throw new Exception( $activate_results['error'] );
-
 			}
+
+			throw new Exception( 'License could not activate. Please contact support.' );
 
 		} catch ( Exception $e ) {
 			$this->add_error( $e->getMessage() );
@@ -260,7 +251,7 @@ class WPJM_Updater {
 	 * Action links
 	 */
 	public function action_links( $links ) {
-		$links[] = '<a href="' . remove_query_arg( array( 'deactivated_licence', 'activated_licence' ), add_query_arg( $this->plugin_slug . '_deactivate_licence', 1 ) ) . '">' . 'Deactivate licence' . '</a>';
+		$links[] = '<a href="' . remove_query_arg( array( 'deactivated_licence', 'activated_licence' ), add_query_arg( $this->plugin_slug . '_deactivate_licence', 1 ) ) . '">' . 'Deactivate License' . '</a>';
 		return $links;
 	}
 
@@ -405,7 +396,7 @@ class WPJM_Updater {
 	 */
 	public function handle_errors( $errors ) {
 		if ( ! empty( $errors['no_key'] ) ) {
-			$this->add_error( sprintf( 'A licence key for %s could not be found. Maybe you forgot to enter a licence key when setting up %s.', esc_html( $this->plugin_data['Name'] ), esc_html( $this->plugin_data['Name'] ) ) );
+			$this->add_error( sprintf( 'A license key for %s could not be found. Maybe you forgot to enter a license key when setting up %s.', esc_html( $this->plugin_data['Name'] ), esc_html( $this->plugin_data['Name'] ) ) );
 		} elseif ( ! empty( $errors['invalid_request'] ) ) {
 			$this->add_error( 'Invalid update request' );
 		} elseif ( ! empty( $errors['invalid_key'] ) ) {
