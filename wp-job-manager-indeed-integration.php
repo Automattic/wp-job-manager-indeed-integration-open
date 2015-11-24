@@ -3,13 +3,12 @@
 Plugin Name: WP Job Manager - Indeed Integration
 Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
 Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
-Version: 2.1.10
-Author: Mike Jolley
-Author URI: http://mikejolley.com
-Requires at least: 3.8
-Tested up to: 4.3
-
-	Copyright: 2013 Mike Jolley
+Version: 2.1.11
+Author: Automattic
+Author URI: http://wpjobmanager.com
+Requires at least: 4.1
+Tested up to: 4.4
+	Copyright: 2015 Automattic
 	License: GNU General Public License v3.0
 	License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
@@ -39,7 +38,7 @@ class WP_Job_Manager_Indeed_Integration {
 	 */
 	public function __construct() {
 		// Define constants
-		define( 'JOB_MANAGER_INDEED_VERSION', '2.1.10' );
+		define( 'JOB_MANAGER_INDEED_VERSION', '2.1.11' );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
@@ -176,30 +175,45 @@ class WP_Job_Manager_Indeed_Integration {
 						'std' 		=> 10,
 						'label'     => __( 'Backfilling (no results)', 'wp-job-manager-indeed-integration' ),
 						'desc'		=> __( 'If there are no jobs found, backfill with X jobs from Indeed instead. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
-						'type'      => 'input'
+						'type'       => version_compare( JOB_MANAGER_VERSION, '1.23.11', '>' ) ? 'number' : 'input',
+						'attributes' => array(
+							'min'       => 0,
+							'max'       => 25
+						)
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_before_jobs',
 						'std' 		=> '0',
 						'label' 	=> __( 'Backfill before jobs', 'wp-job-manager-indeed-integration' ),
 						'desc'		=> __( 'Show a maximum of X jobs from Indeed above your job listings. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
-						'type'      => 'input'
+						'type'       => version_compare( JOB_MANAGER_VERSION, '1.23.11', '>' ) ? 'number' : 'input',
+						'attributes' => array(
+							'min'       => 0,
+							'max'       => 25
+						)
 					),
 					array(
 						'name' 		=> 'job_manager_indeed_after_jobs',
 						'std' 		=> '0',
 						'label' 	=> __( 'Backfill after jobs', 'wp-job-manager-indeed-integration' ),
 						'desc'		=> __( 'Show a maximum of X jobs from Indeed after the last page of your job listings. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
-						'type'      => 'input'
+						'type'       => version_compare( JOB_MANAGER_VERSION, '1.23.11', '>' ) ? 'number' : 'input',
+						'attributes' => array(
+							'min'       => 0,
+							'max'       => 25
+						)
 					),
 					array(
-						'name' 		=> 'job_manager_indeed_per_page',
-						'std' 		=> '0',
-						'label' 	=> __( 'Backfill per page', 'wp-job-manager-indeed-integration' ),
-						'desc'		=> __( 'For each page of jobs loaded, show a maximum of X jobs from Indeed. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
-						'type'      => 'input'
+						'name' 		 => 'job_manager_indeed_per_page',
+						'std' 		 => '0',
+						'label' 	 => __( 'Backfill per page', 'wp-job-manager-indeed-integration' ),
+						'desc'		 => __( 'For each page of jobs loaded, show a maximum of X jobs from Indeed. Leave blank or set to 0 to disable.', 'wp-job-manager-indeed-integration' ),
+						'type'       => version_compare( JOB_MANAGER_VERSION, '1.23.11', '>' ) ? 'number' : 'input',
+						'attributes' => array(
+							'min'       => 0,
+							'max'       => 25
+						)
 					),
-
 					array(
 						'name' 		=> 'job_manager_indeed_search_title_only',
 						'std' 		=> 1,
