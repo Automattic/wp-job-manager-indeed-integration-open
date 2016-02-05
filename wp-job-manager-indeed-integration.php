@@ -137,7 +137,7 @@ class WP_Job_Manager_Indeed_Integration {
 						'name' 		=> 'job_manager_indeed_default_query',
 						'std' 		=> 'Web Developer',
 						'label' 	=> __( 'Default query', 'wp-job-manager-indeed-integration' ),
-						'desc'		=> __( 'Enter terms to search for by default. By default terms are ANDed. Search for multiple terms at once by using the "or" keyword between each keyword. e.g. <code>Term1 or Term2</code>', 'wp-job-manager-indeed-integration' ),
+						'desc'		=> __( 'Enter terms to search for by default. By default terms are ANDed. Search for multiple terms at once by using the "or" keyword between each keyword. e.g. <code>"Term 1" or "Term 2"</code>', 'wp-job-manager-indeed-integration' ),
 						'type'      => 'input'
 					),
 					array(
