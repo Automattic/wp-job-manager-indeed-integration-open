@@ -39,6 +39,7 @@ $args  = array(
 		'compare' => '!='
 	)
 );
+apply_filters( 'job_manager_indeed_feed_args', $args );
 
 /**
  * Run the Query
