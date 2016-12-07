@@ -29,6 +29,9 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+= 2.1.12=
+* Adds 'job_manager_indeed_feed_args' filter to filter the XML feed args.
+
 = 2.1.11 =
 * Use number input in settings if available.
 
