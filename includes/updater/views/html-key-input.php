@@ -10,7 +10,8 @@
 	</td>
 	<script>
 		jQuery(function(){
-			jQuery('tr#<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key_row').prev().addClass('wpjm-updater-licenced');
+		    var $licenseRow = jQuery('tr#<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key_row');
+			$licenseRow.prev().addClass('wpjm-updater-licenced').attr('id', '<?php echo esc_attr( sanitize_title( $this->plugin_slug . '_row' ) ); ?>');
 		});
 	</script>
 </tr>
