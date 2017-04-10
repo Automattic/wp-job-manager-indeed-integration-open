@@ -9,8 +9,18 @@
 		</div>
 	</td>
 	<script>
-		jQuery(function(){
-			jQuery('tr#<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key_row').prev().addClass('wpjm-updater-licenced');
-		});
+		jQuery( function() {
+			var $licenseRow = jQuery( 'tr#<?php echo esc_attr( $this->plugin_slug ); ?>_licence_key_row' );
+			var $parentRow = $licenseRow.prev();
+			var ENTER_KEYCODE = '13';
+			$licenseRow.find( 'input[type="text"]' ).keypress( function( e ) {
+				var keycode = e.keyCode ? e.keyCode : e.which;
+				if ( ENTER_KEYCODE == keycode ) {
+					$parentRow.find( 'input[type="checkbox"][name="checked[]"]' ).first().prop( 'checked', true );
+					jQuery( '#bulk-action-selector-bottom, #bulk-action-selector-top' ).val( '-1' );
+				}
+			} );
+			$parentRow.addClass( 'wpjm-updater-licenced' ).attr( 'id', '<?php echo esc_attr( sanitize_title( $this->plugin_slug . '_row' ) ); ?>' );
+		} );
 	</script>
 </tr>
