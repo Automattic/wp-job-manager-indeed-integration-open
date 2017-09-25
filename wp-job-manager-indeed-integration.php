@@ -41,13 +41,23 @@ class WP_Job_Manager_Indeed_Integration {
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
-		// Add actions
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+		// Install and uninstall
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
+
+		// Set up startup actions
+		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ), 12 );
+		add_action( 'plugins_loaded', array( $this, 'init_plugin' ), 13 );
 		add_action( 'admin_notices', array( $this, 'version_check' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 5 );
-		add_filter( 'job_manager_settings', array( $this, 'settings' ) );
-		add_action( 'admin_footer-job_listing_page_job-manager-settings', array( $this, 'settings_js' ) );
-		add_action( 'job_manager_imported_jobs_start', array( $this, 'add_attribution' ) );
+	}
+
+	/**
+	 * Initializes plugin.
+	 */
+	public function init_plugin() {
+		if ( ! class_exists( 'WP_Job_Manager' ) ) {
+			return;
+		}
 
 		// Includes
 		include_once( 'includes/class-wp-job-manager-indeed-import.php' );
@@ -55,9 +65,10 @@ class WP_Job_Manager_Indeed_Integration {
 		include_once( 'includes/class-wp-job-manager-indeed-shortcode.php' );
 		include_once( 'includes/class-wp-job-manager-indeed-export.php' );
 
-		// Install and uninstall
-		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
-		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 5 );
+		add_filter( 'job_manager_settings', array( $this, 'settings' ) );
+		add_action( 'admin_footer-job_listing_page_job-manager-settings', array( $this, 'settings_js' ) );
+		add_action( 'job_manager_imported_jobs_start', array( $this, 'add_attribution' ) );
 	}
 
 	/**
