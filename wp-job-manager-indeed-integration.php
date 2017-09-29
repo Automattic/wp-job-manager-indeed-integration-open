@@ -75,11 +75,36 @@ class WP_Job_Manager_Indeed_Integration {
 	 * Checks WPJM core version.
 	 */
 	public function version_check() {
-		if ( ! defined( 'JOB_MANAGER_VERSION' ) ) {
-			?><div class="error"><p><?php _e( '<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager to be installed and activated.', 'wp-job-manager-indeed-integration' ); ?></p></div><?php
-		} elseif ( version_compare( JOB_MANAGER_VERSION, self::JOB_MANAGER_CORE_MIN_VERSION, '<' ) ) {
-			?><div class="error"><p><?php printf( __( '<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager %s (you are using %s).', 'wp-job-manager-indeed-integration' ), self::JOB_MANAGER_CORE_MIN_VERSION, JOB_MANAGER_VERSION ); ?></p></div><?php
+		if ( ! class_exists( 'WP_Job_Manager' ) || ! defined( 'JOB_MANAGER_VERSION' ) ) {
+			$screen = get_current_screen();
+			if ( null !== $screen && 'plugins' === $screen->id ) {
+				$this->display_error( __( '<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager to be installed and activated.', 'wp-job-manager-indeed-integration' ) );
+			}
+		} elseif (
+			/**
+			 * Filters if WPJM core's version should be checked.
+			 *
+			 * @since 1.16.0
+			 *
+			 * @param bool   $do_check                       True if the add-on should do a core version check.
+			 * @param string $minimum_required_core_version  Minimum version the plugin is reporting it requires.
+			 */
+			apply_filters( 'job_manager_addon_core_version_check', true, self::JOB_MANAGER_CORE_MIN_VERSION )
+			&& version_compare( JOB_MANAGER_VERSION, self::JOB_MANAGER_CORE_MIN_VERSION, '<' )
+		) {
+			$this->display_error(  sprintf( __( '<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager %s (you are using %s).', 'wp-job-manager-indeed-integration' ), self::JOB_MANAGER_CORE_MIN_VERSION, JOB_MANAGER_VERSION ) );
 		}
+	}
+
+	/**
+	 * Display error message notice in the admin.
+	 *
+	 * @param string $message
+	 */
+	private function display_error( $message ) {
+		echo '<div class="error">';
+		echo '<p>' . $message . '</p>';
+		echo '</div>';
 	}
 
 	/**
