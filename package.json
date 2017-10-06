@@ -1,21 +1,41 @@
 {
-  "name": "wp-job-manager-resumes",
-  "title": "WP Job Manager Resumes",
-  "version": "1.1.2",
+  "name": "wp-job-manager-indeed-integration",
+  "title": "WP Job Manager - Indeed Integration",
+  "version": "2.1.11",
   "homepage": "http://wordpress.org/plugins/wp-job-manager/",
-  "main": "Gruntfile.js",
+  "license": "GPL-2.0+",
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-uglify": "~0.9.2",
-    "grunt-contrib-less": "~0.9.0",
-    "grunt-contrib-cssmin": "~0.7.0",
-    "grunt-shell": "~0.6.4",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-clean": "0.5.x",
-    "grunt-contrib-watch": "~0.5.3"
+    "grunt": "~1.0.1",
+    "grunt-checkbranch": "^1.0.4",
+    "grunt-checktextdomain": "~1.0.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-concat": "1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "~2.2.0",
+    "grunt-contrib-jshint": "~1.1.0",
+    "grunt-contrib-less": "~1.4.0",
+    "grunt-contrib-sass": "~1.0.0",
+    "grunt-contrib-uglify": "~3.0.0",
+    "grunt-contrib-watch": "~1.0.0",
+    "grunt-gitinfo": "^0.1.8",
+    "grunt-phpcs": "^0.4.0",
+    "grunt-phpunit": "^0.3.6",
+    "grunt-postcss": "^0.8.0",
+    "grunt-rtlcss": "2.0.1",
+    "grunt-shell": "^2.1.0",
+    "grunt-stylelint": "^0.6.0",
+    "grunt-wp-i18n": "~1.0.0",
+    "grunt-wp-readme-to-markdown": "^2.0.0",
+    "grunt-zip": "^0.17.1"
   },
   "engines": {
-    "node": ">=0.8.0",
-    "npm": ">=1.1.0"
+    "node": ">=6.10.2"
+  },
+  "scripts": {
+    "distclean": "rm -rf node_modules && yarn cache clean && rm -rf tmp",
+    "build": "grunt build",
+    "watch": "grunt watch",
+    "package": "grunt package",
+    "test": "grunt test"
   }
 }
