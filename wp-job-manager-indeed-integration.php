@@ -270,5 +270,5 @@ class WP_Job_Manager_Indeed_Integration {
 	}
 }
 
-new WP_Job_Manager_Indeed_Integration();
+$GLOBALS['job_manager_indeed_integration'] = new WP_Job_Manager_Indeed_Integration();
 new WPJM_Updater( __FILE__ );

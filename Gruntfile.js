@@ -3,11 +3,14 @@ module.exports = function( grunt ){
 	'use strict';
 
 	grunt.initConfig({
+		pluginSlug: 'wp-job-manager-indeed-integration',
+
 		// setting folder templates
 		dirs: {
 			css: 'assets/css',
 			images: 'assets/images',
-			js: 'assets/js'
+			js: 'assets/js',
+			build: 'tmp/build',
 		},
 
 		// Compile all .less files.
@@ -61,6 +64,25 @@ module.exports = function( grunt ){
 			},
 		},
 
+		copy: {
+			main: {
+				src: [
+					'**',
+					'!*.log', // Log Files
+					'!node_modules/**', '!Gruntfile.js', '!package.json','!package-lock.json', '!yarn.lock', // NPM/Grunt
+					'!.git/**', '!.github/**', // Git / Github
+					'!tests/**', '!bin/**', '!phpunit.xml', '!phpunit.xml.dist', // Unit Tests
+					'!vendor/**', '!composer.lock', '!composer.phar', '!composer.json', // Composer
+					'!.*', '!**/*~', '!tmp/**', //hidden/tmp files
+					'!CONTRIBUTING.md',
+					'!readme.md',
+					'!phpcs.ruleset.xml',
+					'!tools/**'
+				],
+				dest: '<%= dirs.build %>/'
+			}
+		},
+
 		// Watch changes for assets
 		watch: {
 			less: {
@@ -76,63 +98,158 @@ module.exports = function( grunt ){
 			}
 		},
 
-		shell: {
+		// Generate POT files.
+		makepot: {
 			options: {
-				stdout: true,
-				stderr: true
+				type: 'wp-plugin',
+				domainPath: '/languages',
+				potHeaders: {
+					'language-team': 'LANGUAGE <EMAIL@ADDRESS>'
+				}
 			},
-			generatepot: {
-				command: [
-					'makepot'
-				].join( '&&' )
+			dist: {
+				options: {
+					potFilename: '<%= pluginSlug %>.pot',
+					exclude: [
+						'apigen/.*',
+						'tests/.*',
+						'tmp/.*',
+						'vendor/.*',
+						'node_modules/.*'
+					]
+				}
 			}
 		},
 
-		copy: {
-			deploy: {
-				src: [
-					'**',
-					'!Gruntfile.js',
-					'!package.json',
-					'!node_modules/**'
-				],
-				dest: 'wp-job-manager-indeed-integration',
-				expand: true
+		// Check textdomain errors.
+		checktextdomain: {
+			options:{
+				text_domain: '<%= pluginSlug %>',
+				keywords: [
+					'__:1,2d',
+					'_e:1,2d',
+					'_x:1,2c,3d',
+					'esc_html__:1,2d',
+					'esc_html_e:1,2d',
+					'esc_html_x:1,2c,3d',
+					'esc_attr__:1,2d',
+					'esc_attr_e:1,2d',
+					'esc_attr_x:1,2c,3d',
+					'_ex:1,2c,3d',
+					'_n:1,2,4d',
+					'_nx:1,2,4c,5d',
+					'_n_noop:1,2,3d',
+					'_nx_noop:1,2,3c,4d'
+				]
 			},
+			files: {
+				src:  [
+					'**/*.php',         // Include all files
+					'!apigen/**',       // Exclude apigen/
+					'!node_modules/**', // Exclude node_modules/
+					'!tests/**',        // Exclude tests/
+					'!vendor/**',       // Exclude vendor/
+					'!tmp/**'           // Exclude tmp/
+				],
+				expand: true
+			}
+		},
+
+		addtextdomain: {
+			wpjobmanager: {
+				options: {
+					textdomain: '<%= pluginSlug %>'
+				},
+				files: {
+					src: [
+						'*.php',
+						'**/*.php',
+						'!node_modules/**',
+						'!tmp/**'
+					]
+				}
+			}
+		},
+
+		zip: {
+			'main': {
+				cwd: '<%= dirs.build %>/',
+				src: [ '<%= dirs.build %>/**' ],
+				dest: 'tmp/<%= pluginSlug %>.zip'
+			}
+		},
+
+		phpunit: {
+			main: {
+				dir: ''
+			},
+			options: {
+				bin: 'vendor/bin/phpunit',
+				colors: true
+			}
 		},
 
 		clean: {
-			deploy: {
-				src: [ 'wp-job-manager-indeed-integration' ]
-			},
+			main: [ 'tmp/' ], //Clean up build folder
 		},
 
+		jshint: {
+			options: grunt.file.readJSON('.jshintrc'),
+			src: [
+				'assets/js/**/*.js',
+				'!assets/js/**/*.min.js',
+			]
+		},
+
+		wp_readme_to_markdown: {
+			readme: {
+				files: {
+					'readme.md': 'readme.txt'
+				}
+			}
+		}
 	});
 
 	// Load NPM tasks to be used here
-	grunt.loadNpmTasks( 'grunt-shell' );
 	grunt.loadNpmTasks( 'grunt-contrib-less' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
+	grunt.loadNpmTasks( 'grunt-contrib-jshint' );
+	grunt.loadNpmTasks( 'grunt-checktextdomain' );
 	grunt.loadNpmTasks( 'grunt-contrib-copy' );
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
+	grunt.loadNpmTasks( 'grunt-gitinfo' );
+	grunt.loadNpmTasks( 'grunt-phpunit' );
+	grunt.loadNpmTasks( 'grunt-checkbranch' );
+	grunt.loadNpmTasks( 'grunt-shell' );
+	grunt.loadNpmTasks( 'grunt-wp-i18n' );
+	grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown');
+	grunt.loadNpmTasks( 'grunt-zip' );
+
+	grunt.registerTask( 'build', [ 'gitinfo', 'test', 'clean', 'copy' ] );
+
+	grunt.registerTask( 'package', [ 'build', 'zip' ] );
 
 	// Register tasks
 	grunt.registerTask( 'default', [
 		'less',
 		'cssmin',
-		'uglify'
-	]);
+		'uglify',
+		'wp_readme_to_markdown'
+	] );
 
 	// Just an alias for pot file generation
 	grunt.registerTask( 'pot', [
-		'shell:generatepot'
-	]);
+		'makepot'
+	] );
 
-	grunt.registerTask( 'deploy', [
-		'clean:deploy',
-		'copy:deploy'
-	]);
+	grunt.registerTask( 'test', [
+		'phpunit'
+	] );
 
+	grunt.registerTask( 'dev', [
+		'test',
+		'default'
+	] );
 };
