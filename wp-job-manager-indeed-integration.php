@@ -1,26 +1,24 @@
 <?php
-/*
-Plugin Name: WP Job Manager - Indeed Integration
-Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
-Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
-Version: 2.1.11
-Author: Automattic
-Author URI: http://wpjobmanager.com
-Requires at least: 4.1
-Tested up to: 4.4
-	Copyright: 2015 Automattic
-	License: GNU General Public License v3.0
-	License URI: http://www.gnu.org/licenses/gpl-3.0.html
-*/
+/**
+ * Plugin Name: WP Job Manager - Indeed Integration
+ * Plugin URI: https://wpjobmanager.com/add-ons/indeed-integration/
+ * Description: Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
+ * Version: 2.1.11
+ * Author: Automattic
+ * Author URI: https://wpjobmanager.com
+ * Requires at least: 4.1
+ * Tested up to: 4.8
+ *
+ * WPJM-Product: wp-job-manager-indeed-integration
+ *
+ * Copyright: 2017 Automattic
+ * License: GNU General Public License v3.0
+ * License URI: http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-}
-
-// Updater
-if ( ! class_exists( 'WPJM_Updater' ) ) {
-	include( 'includes/updater/class-wpjm-updater.php' );
 }
 
 // Import Framework
@@ -32,6 +30,7 @@ if ( ! class_exists( 'WP_Job_Manager_Importer_Integration' ) ) {
  * WP_Job_Manager_Indeed_Integration class.
  */
 class WP_Job_Manager_Indeed_Integration {
+	const JOB_MANAGER_CORE_MIN_VERSION = '1.29.0';
 
 	/**
 	 * __construct function.
@@ -42,12 +41,23 @@ class WP_Job_Manager_Indeed_Integration {
 		define( 'JOB_MANAGER_INDEED_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
-		// Add actions
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ), 12 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 5 );
-		add_filter( 'job_manager_settings', array( $this, 'settings' ) );
-		add_action( 'admin_footer-job_listing_page_job-manager-settings', array( $this, 'settings_js' ) );
-		add_action( 'job_manager_imported_jobs_start', array( $this, 'add_attribution' ) );
+		// Install and uninstall
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
+
+		// Set up startup actions
+		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ), 12 );
+		add_action( 'plugins_loaded', array( $this, 'init_plugin' ), 13 );
+		add_action( 'admin_notices', array( $this, 'version_check' ) );
+	}
+
+	/**
+	 * Initializes plugin.
+	 */
+	public function init_plugin() {
+		if ( ! class_exists( 'WP_Job_Manager' ) ) {
+			return;
+		}
 
 		// Includes
 		include_once( 'includes/class-wp-job-manager-indeed-import.php' );
@@ -55,9 +65,46 @@ class WP_Job_Manager_Indeed_Integration {
 		include_once( 'includes/class-wp-job-manager-indeed-shortcode.php' );
 		include_once( 'includes/class-wp-job-manager-indeed-export.php' );
 
-		// Install and uninstall
-		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
-		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), 5 );
+		add_filter( 'job_manager_settings', array( $this, 'settings' ) );
+		add_action( 'admin_footer-job_listing_page_job-manager-settings', array( $this, 'settings_js' ) );
+		add_action( 'job_manager_imported_jobs_start', array( $this, 'add_attribution' ) );
+	}
+
+	/**
+	 * Checks WPJM core version.
+	 */
+	public function version_check() {
+		if ( ! class_exists( 'WP_Job_Manager' ) || ! defined( 'JOB_MANAGER_VERSION' ) ) {
+			$screen = get_current_screen();
+			if ( null !== $screen && 'plugins' === $screen->id ) {
+				$this->display_error( __( '<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager to be installed and activated.', 'wp-job-manager-indeed-integration' ) );
+			}
+		} elseif (
+			/**
+			 * Filters if WPJM core's version should be checked.
+			 *
+			 * @since 1.16.0
+			 *
+			 * @param bool   $do_check                       True if the add-on should do a core version check.
+			 * @param string $minimum_required_core_version  Minimum version the plugin is reporting it requires.
+			 */
+			apply_filters( 'job_manager_addon_core_version_check', true, self::JOB_MANAGER_CORE_MIN_VERSION )
+			&& version_compare( JOB_MANAGER_VERSION, self::JOB_MANAGER_CORE_MIN_VERSION, '<' )
+		) {
+			$this->display_error(  sprintf( __( '<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager %s (you are using %s).', 'wp-job-manager-indeed-integration' ), self::JOB_MANAGER_CORE_MIN_VERSION, JOB_MANAGER_VERSION ) );
+		}
+	}
+
+	/**
+	 * Display error message notice in the admin.
+	 *
+	 * @param string $message
+	 */
+	private function display_error( $message ) {
+		echo '<div class="error">';
+		echo '<p>' . $message . '</p>';
+		echo '</div>';
 	}
 
 	/**
@@ -271,4 +318,3 @@ class WP_Job_Manager_Indeed_Integration {
 }
 
 $GLOBALS['job_manager_indeed_integration'] = new WP_Job_Manager_Indeed_Integration();
-new WPJM_Updater( __FILE__ );
