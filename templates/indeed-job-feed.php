@@ -1,4 +1,20 @@
 <?php
+/**
+ * Generates the content of the job feed to include Indeed records.
+ *
+ * This template can be overridden by copying it to yourtheme/job-manager-indeed-integration/indeed-job-feed.php.
+ *
+ * @see         https://wpjobmanager.com/document/template-overrides/
+ * @author      Automattic
+ * @package     WP Job Manager - Indeed Integration
+ * @category    Template
+ * @version     2.1.11
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 header( 'Content-Type: text/xml' );
 $xml_document = new DOMDocument( '1.0','utf-8' );
 $xml_document->formatOutput = true;
