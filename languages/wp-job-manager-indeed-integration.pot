@@ -1,17 +1,18 @@
-# Copyright (C) 2015 WP Job Manager - Indeed Integration
-# This file is distributed under the same license as the WP Job Manager - Indeed Integration package.
+# Copyright (C) 2017 Automattic
+# This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Job Manager - Indeed Integration 2.1.11\n"
-"Report-Msgid-Bugs-To: http://wordpress.org/tag/wp-job-manager-indeed-"
-"integration\n"
-"POT-Creation-Date: 2015-11-24 16:04:33+00:00\n"
+"Project-Id-Version: WP Job Manager - Indeed Integration 2.2.0\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/wp-job-manager-indeed-integration\n"
+"POT-Creation-Date: 2017-10-18 17:27:09+00:00\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2017-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"X-Generator: grunt-wp-i18n1.0.0\n"
 
 #: includes/class-wp-job-manager-indeed-api.php:161
 msgid "Source: %s"
@@ -25,210 +26,202 @@ msgstr ""
 msgid "%s ago"
 msgstr ""
 
-#: includes/updater/views/html-key-input.php:5
-msgid "License"
-msgstr ""
-
-#: includes/updater/views/html-key-input.php:8
+#: wp-job-manager-indeed-integration.php:81
 msgid ""
-"Enter your license key and email and hit return. A valid key is required for "
-"updates."
+"<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager to be "
+"installed and activated."
 msgstr ""
 
-#: includes/updater/views/html-key-notice.php:2
-msgid "Hide notice"
-msgstr ""
-
-#: includes/updater/views/html-ms-update.php:6
+#: wp-job-manager-indeed-integration.php:95
 msgid ""
-"There is a new version of %1$s available. <a target=\"_blank\" class="
-"\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s"
-"\">update now</a>."
+"<em>WP Job Manager - Indeed Integration</em> requires WP Job Manager %s "
+"(you are using %s)."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:86
+#: wp-job-manager-indeed-integration.php:133
 msgid "Indeed Integration"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:93
+#: wp-job-manager-indeed-integration.php:140
 msgid "Publisher ID"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:94
+#: wp-job-manager-indeed-integration.php:141
 msgid ""
-"To show search results from Indeed you will need a publisher account. Obtain "
-"this here: https://ads.indeed.com/jobroll/signup"
+"To show search results from Indeed you will need a publisher account. "
+"Obtain this here: https://ads.indeed.com/jobroll/signup"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:101
+#: wp-job-manager-indeed-integration.php:148
 msgid "Enable XML Feed"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:102
+#: wp-job-manager-indeed-integration.php:149
 msgid "Enable Indeed XML feed."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:103
+#: wp-job-manager-indeed-integration.php:150
 msgid ""
-"The generated feed can be used to submit jobs to Indeed (see <a href="
-"\"http://www.indeed.com/intl/en/xmlinfo.html\">here</a>). Your feed will be "
-"found at: %s"
+"The generated feed can be used to submit jobs to Indeed (see <a "
+"href=\"http://www.indeed.com/intl/en/xmlinfo.html\">here</a>). Your feed "
+"will be found at: %s"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:110
+#: wp-job-manager-indeed-integration.php:157
 msgid "XML Feed Job Limit"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:111
+#: wp-job-manager-indeed-integration.php:158
 msgid ""
 "Enter how many jobs should be listed in your feed maximum. Leave blank to "
 "show all (if the server has enough memory/resources)."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:118
+#: wp-job-manager-indeed-integration.php:165
 msgid "Enable Backfill"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:119
+#: wp-job-manager-indeed-integration.php:166
 msgid "Enable backfilling jobs from Indeed"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:120
+#: wp-job-manager-indeed-integration.php:167
 msgid ""
 "Enabling this allows you to show sponsored job listings from Indeed within "
 "your own job lists."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:128
+#: wp-job-manager-indeed-integration.php:175
 msgid "All web sites"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:129
+#: wp-job-manager-indeed-integration.php:176
 msgid "Job boards only"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:130
+#: wp-job-manager-indeed-integration.php:177
 msgid "Employer websites only"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:132
+#: wp-job-manager-indeed-integration.php:179
 msgid "Site type"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:133
+#: wp-job-manager-indeed-integration.php:180
 msgid "Choose where results should come from."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:139
+#: wp-job-manager-indeed-integration.php:186
 msgid "Default query"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:140
+#: wp-job-manager-indeed-integration.php:187
 msgid ""
-"Enter terms to search for by default. By default terms are ANDed. Search for "
-"multiple terms at once by using the \"or\" keyword between each keyword. e."
-"g. <code>Term1 or Term2</code>"
+"Enter terms to search for by default. By default terms are ANDed. Search "
+"for multiple terms at once by using the \"or\" keyword between each "
+"keyword. e.g. <code>\"Term 1\" or \"Term 2\"</code>"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:146
+#: wp-job-manager-indeed-integration.php:193
 msgid "Default location"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:147
+#: wp-job-manager-indeed-integration.php:194
 msgid "Enter a location to search for by default."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:153
+#: wp-job-manager-indeed-integration.php:200
 msgid "Default job type"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:154
+#: wp-job-manager-indeed-integration.php:201
 msgid "Choose which type of job to query by default."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:157
+#: wp-job-manager-indeed-integration.php:204
 msgid "All"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:158
+#: wp-job-manager-indeed-integration.php:205
 msgid "Full time"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:159
+#: wp-job-manager-indeed-integration.php:206
 msgid "Part time"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:160
+#: wp-job-manager-indeed-integration.php:207
 msgid "Contract"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:161
+#: wp-job-manager-indeed-integration.php:208
 msgid "Internship"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:162
+#: wp-job-manager-indeed-integration.php:209
 msgid "Temporary"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:168
+#: wp-job-manager-indeed-integration.php:215
 msgid "Default country"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:169
+#: wp-job-manager-indeed-integration.php:216
 msgid ""
-"Choose a default country to show jobs from. See http://www.indeed.com/"
-"worldwide for the full list of supported country codes."
+"Choose a default country to show jobs from. See "
+"http://www.indeed.com/worldwide for the full list of supported country "
+"codes."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:176
+#: wp-job-manager-indeed-integration.php:223
 msgid "Backfilling (no results)"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:177
+#: wp-job-manager-indeed-integration.php:224
 msgid ""
 "If there are no jobs found, backfill with X jobs from Indeed instead. Leave "
 "blank or set to 0 to disable."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:187
+#: wp-job-manager-indeed-integration.php:234
 msgid "Backfill before jobs"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:188
+#: wp-job-manager-indeed-integration.php:235
 msgid ""
-"Show a maximum of X jobs from Indeed above your job listings. Leave blank or "
-"set to 0 to disable."
+"Show a maximum of X jobs from Indeed above your job listings. Leave blank "
+"or set to 0 to disable."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:198
+#: wp-job-manager-indeed-integration.php:245
 msgid "Backfill after jobs"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:199
+#: wp-job-manager-indeed-integration.php:246
 msgid ""
 "Show a maximum of X jobs from Indeed after the last page of your job "
 "listings. Leave blank or set to 0 to disable."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:209
+#: wp-job-manager-indeed-integration.php:256
 msgid "Backfill per page"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:210
+#: wp-job-manager-indeed-integration.php:257
 msgid ""
 "For each page of jobs loaded, show a maximum of X jobs from Indeed. Leave "
 "blank or set to 0 to disable."
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:220
+#: wp-job-manager-indeed-integration.php:267
 msgid "Query titles"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:221
+#: wp-job-manager-indeed-integration.php:268
 msgid "Query job titles only"
 msgstr ""
 
-#: wp-job-manager-indeed-integration.php:222
+#: wp-job-manager-indeed-integration.php:269
 msgid ""
 "Enabling this will search within Indeed job titles only. Otherwise the full "
 "description will be searched."
@@ -255,5 +248,5 @@ msgid "Automattic"
 msgstr ""
 
 #. Author URI of the plugin/theme
-msgid "http://wpjobmanager.com"
+msgid "https://wpjobmanager.com"
 msgstr ""
