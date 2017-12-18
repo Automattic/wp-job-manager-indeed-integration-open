@@ -2,7 +2,7 @@
 /**
  * Adds attribution for Indeed records.
  *
- * This template can be overridden by copying it to yourtheme/job-manager-indeed-integration/content-attribution.php.
+ * This template can be overridden by copying it to yourtheme/indeed/content-attribution.php.
  *
  * @see         https://wpjobmanager.com/document/template-overrides/
  * @author      Automattic
