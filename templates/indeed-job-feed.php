@@ -89,11 +89,13 @@ while ( $query->have_posts() ) : $query->the_post();
 	$job_element->appendChild($date);
 
 	// Expiry date
-	$expiry_date = $xml_document->createElement( 'expirydate' );
 	$get_expiry_date = get_post_meta( get_the_ID(), '_job_expires', true );
-	$get_expiry_date = date( get_option( 'date_format' ), strtotime( $get_expiry_date ) );
-	$expiry_date->appendChild( $xml_document->createCDATASection( $get_expiry_date ) );
-	$job_element->appendChild( $expiry_date );
+	if ( ! empty( $get_expiry_date ) ) {
+		$expiry_date = $xml_document->createElement( 'expirydate' );
+		$get_expiry_date = date( get_option( 'date_format' ), strtotime( $get_expiry_date ) );
+		$expiry_date->appendChild( $xml_document->createCDATASection( $get_expiry_date ) );
+		$job_element->appendChild( $expiry_date );
+	}
 
 	// Job ID
 	$rooteferencenumber = $xml_document->createElement("referencenumber");
