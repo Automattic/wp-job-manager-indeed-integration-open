@@ -119,7 +119,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 		}
 
 		return WP_Job_Manager_Indeed_API::get_jobs( array(
-			'sort'  => 'relevance',
+			'sort'  => 'date',
 			'q'     => $search_keywords ? $search_keywords : get_option( 'job_manager_indeed_default_query' ),
 			'l'     => $search_location ? $search_location : get_option( 'job_manager_indeed_default_location' ),
 			'co'    => $search_country,
