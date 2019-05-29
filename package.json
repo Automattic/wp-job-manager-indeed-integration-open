@@ -1,7 +1,7 @@
 {
   "name": "wp-job-manager-indeed-integration",
   "title": "WP Job Manager - Indeed Integration",
-  "version": "2.1.11",
+  "version": "2.2.1",
   "homepage": "http://wordpress.org/plugins/wp-job-manager/",
   "license": "GPL-2.0+",
   "devDependencies": {
