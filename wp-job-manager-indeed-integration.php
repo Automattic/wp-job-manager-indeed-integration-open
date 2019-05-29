@@ -42,13 +42,22 @@ class WP_Job_Manager_Indeed_Integration {
 		define( 'JOB_MANAGER_INDEED_PLUGIN_URL', untrailingslashit( plugins_url( basename( plugin_dir_path( __FILE__ ) ), basename( __FILE__ ) ) ) );
 
 		// Install and uninstall
-		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( 'WP_Job_Manager_Indeed_Export', 'add_jobs_feed' ), 10 );
+		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), array( __CLASS__, 'activate' ) );
 		register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FILE__ ), 'flush_rewrite_rules', 15 );
 
 		// Set up startup actions
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ), 12 );
 		add_action( 'plugins_loaded', array( $this, 'init_plugin' ), 13 );
 		add_action( 'admin_notices', array( $this, 'version_check' ) );
+	}
+
+	/**
+	 * Add Jobs Feed on activation for rewrite rules.
+	 */
+	public static function activate() {
+		include_once dirname( __FILE__ ) . '/includes/class-wp-job-manager-indeed-export.php';
+
+		WP_Job_Manager_Indeed_Export::add_jobs_feed();
 	}
 
 	/**
