@@ -32,7 +32,7 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 ## Changelog ##
 
 ### 2.2.1 ###
-* Fix issue with geocoding errors crashing job listing results.
+* Fix issue with geocoding errors preventing job listing results from loading.
 
 ### 2.2.0 ###
 * Adds compatibility with WP Job Manager 1.29.0 and requires it for future updates.
