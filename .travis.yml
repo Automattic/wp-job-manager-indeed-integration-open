@@ -3,12 +3,22 @@
 # Tell Travis CI we're using PHP
 language: php
 
+# Tell Travis CI which distro to use
+dist: trusty
+
 # Setup a global environemnt and overide as needed
 env:
   global:
     - WP_TRAVISCI=phpunit
 
-cache: yarn
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+    - $HOME/.npm
+
+branches:
+  only:
+    - master
 
 # Next we define our matrix of additional build configurations to test against.
 # The versions listed above will automatically create our first configuration,
@@ -22,37 +32,54 @@ cache: yarn
 # WP_VERSION specifies the tag to use. The way these tests are configured to run
 # requires at least WordPress 3.8. Specify "master" to test against SVN trunk.
 
+# Next we define our matrix of additional build configurations to test against.
 matrix:
   include:
-  - php: "5.2"
-    dist: precise
-  - php: "5.3"
-    dist: precise
-  - php: "5.5"
-  - php: "5.6"
-  - php: "7.0"
-  - php: "7.1"
+    #    - php: "7.2"
+    #      env: WP_TRAVISCI="phpcs"
+    - php: "5.2"
+      dist: precise
+      env: WP_VERSION=5.1.1 WPJM_VERSION=latest
+    - php: "5.6"
+      env: WP_VERSION=latest WPJM_VERSION=latest
+    - php: "5.6"
+      env: WP_VERSION=master WPJM_VERSION=latest
+    - php: "5.6"
+      env: WP_VERSION=previous WPJM_VERSION=latest
+    - php: "7.0"
+      env: WP_VERSION=latest WPJM_VERSION=latest
+    - php: "7.1"
+      env: WP_VERSION=latest WPJM_VERSION=latest
+    - php: "7.2"
+      env: WP_VERSION=latest WPJM_VERSION=latest
+    - php: "7.2"
+      env: WP_VERSION=latest WPJM_VERSION=previous
+    - php: "7.2"
+      env: WP_VERSION=latest WPJM_VERSION=master
+    - php: "7.3"
+      env: WP_VERSION=latest WPJM_VERSION=latest
 
 # Clones WordPress and configures our testing environment.
 before_script:
-    - phpenv config-rm xdebug.ini
-    - source ~/.nvm/nvm.sh && nvm install 5
-    - export PLUGIN_BASE_DIR=$(basename $(pwd))
-    - export PLUGIN_SLUG=$(basename $(pwd) | tr '[:upper:]' '[:lower:]')
-    - source ~/.nvm/nvm.sh
-    - export PATH="$HOME/.composer/vendor/bin:$PATH"
-    - |
-        if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
-            composer global require "phpunit/phpunit=5.7.*"
-        elif [[ ${TRAVIS_PHP_VERSION:0:3} != "5.2" ]]; then
-            composer global require "phpunit/phpunit=4.8.*"
-        fi
-    - nvm install 6
-    - nvm use 6
-    - ./tests/prepare-env.sh
-    - mysql -e "set global wait_timeout = 3600;"
+  - phpenv config-rm xdebug.ini
+  - export PLUGIN_BASE_DIR=$(basename $(pwd))
+  - export PLUGIN_SLUG=$(basename $(pwd) | tr '[:upper:]' '[:lower:]')
+  - source ~/.nvm/nvm.sh
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - |
+    if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
+        composer global require "phpunit/phpunit=5.7.*"
+    elif [[ ${TRAVIS_PHP_VERSION:0:3} != "5.2" ]]; then
+        composer global require "phpunit/phpunit=4.8.*"
+    fi
+  - nvm install 8
+  - nvm use 8
+  - ./tests/bin/prepare-env.sh
+  - mysql -e "set global wait_timeout = 3600;"
 
 script:
-    - ./tests/run-travis.sh
+  - php -v
+  - phpunit --version
+  - ./tests/bin/run-travis.sh
 
 sudo: false
