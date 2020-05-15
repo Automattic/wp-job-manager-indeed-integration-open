@@ -16,9 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <li class="wp-job-manager-attribution-row job_listing">
-	<?php 
+	<?php
 		printf(
-			__( '<a href="%1s">jobs by <img src="%2s" style="%3s" alt="Indeed job search" /></a>' ),
+			wp_kses(
+				__( '<a href="%1s">jobs by <img src="%2s" style="%3s" alt="Indeed job search" /></a>' ),
+				array(
+					'a' => array(
+						'href' => array()
+					),
+					'img' => array(
+						'src' => array(),
+						'style' => array(),
+						'alt' => array()
+					)
+				)
+			),
 			'https://www.indeed.com',
 			JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/images/jobsearch.gif',
 			'border: 0; vertical-align: middle;'
