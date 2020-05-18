@@ -15,6 +15,7 @@ class WP_Job_Manager_Indeed_Shortcode {
 		add_action( 'wp_ajax_job_manager_get_indeed_listings', array( $this, 'get_jobs_for_shortcode' ) );
 		add_action( 'wp_ajax_nopriv_job_manager_get_indeed_listings', array( $this, 'get_jobs_for_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
+		add_filter( 'job_manager_enqueue_frontend_style', array( $this, 'is_frontend_style_required_on_page' ) );
 		add_shortcode( 'indeed_jobs', array( $this, 'indeed_jobs_shortcode' ) );
 	}
 
@@ -25,6 +26,32 @@ class WP_Job_Manager_Indeed_Shortcode {
 		wp_enqueue_style( 'job-manager-indeed', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/css/frontend.css' );
 		wp_register_script( 'wp-job-manager-indeed-jobs', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/js/indeed-jobs.js', array( 'jquery', 'wp-job-manager-ajax-filters', 'indeed-click-tracking' ), JOB_MANAGER_INDEED_VERSION, true );
 		wp_localize_script( 'wp-job-manager-indeed-jobs', 'job_manager_indeed_jobs', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+	}
+
+	/**
+	 * Filters if WPJM's frontend styles are needed on this page.
+	 *
+	 * @param bool $is_frontend_style_enabled
+	 * @return bool
+	 */
+	public function is_frontend_style_required_on_page( $is_frontend_style_enabled ) {
+		return $is_frontend_style_enabled || $this->is_shortcode_page();
+	}
+
+	/**
+	 * Checks if the current page is the `[indeed_jobs]` page.
+	 *
+	 * @return bool
+	 */
+	private function is_shortcode_page() {
+		global $post;
+
+		$content = null;
+		if ( is_singular() && is_a( $post, 'WP_Post' ) ) {
+			$content = $post->post_content;
+		}
+
+		return has_shortcode( $content, 'indeed_jobs' );
 	}
 
 	/**
