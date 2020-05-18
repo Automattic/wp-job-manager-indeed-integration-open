@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: WP Job Manager - Indeed Integration 2.2.1\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/wp-job-manager-indeed-integration\n"
-"POT-Creation-Date: 2020-05-14 22:30:04+00:00\n"
+"POT-Creation-Date: 2020-05-18 17:40:02+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,7 +14,19 @@ msgstr ""
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "X-Generator: grunt-wp-i18n 1.0.3\n"
 
-#: includes/class-wp-job-manager-indeed-api.php:161
+#: includes/class-wp-job-manager-indeed-api.php:123
+msgid "Full Time"
+msgstr ""
+
+#: includes/class-wp-job-manager-indeed-api.php:126
+msgid "Part Time"
+msgstr ""
+
+#: includes/class-wp-job-manager-indeed-api.php:129
+msgid "Freelance"
+msgstr ""
+
+#: includes/class-wp-job-manager-indeed-api.php:173
 msgid "Source: %s"
 msgstr ""
 
@@ -26,7 +38,7 @@ msgstr ""
 msgid "%s ago"
 msgstr ""
 
-#: templates/content-attribution.php:21
+#: templates/content-attribution.php:22
 msgid ""
 "<a href=\"%1s\">jobs by <img src=\"%2s\" style=\"%3s\" alt=\"Indeed job "
 "search\" /></a>"

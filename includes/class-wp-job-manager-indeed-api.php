@@ -118,7 +118,19 @@ class WP_Job_Manager_Indeed_API {
 					if ( $term && ! is_wp_error( $term ) ) {
 						$job->type = $term->name;
 					} else {
-						$job->type = __( $job->type_slug, 'wp-job-manager-indeed-integration' );
+						switch ( $job->type_slug ) {
+							case 'full-time':
+								$job->type = __( 'Full Time', 'wp-job-manager-indeed-integration' );
+								break;
+							case 'part-time':
+								$job->type = __( 'Part Time', 'wp-job-manager-indeed-integration' );
+								break;
+							case 'freelance':
+								$job->type = __( 'Freelance', 'wp-job-manager-indeed-integration' );
+								break;
+							default:
+								$job->type = $job->type_slug;
+						}
 					}
 				}
 
