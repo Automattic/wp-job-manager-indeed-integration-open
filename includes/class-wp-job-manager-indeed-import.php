@@ -28,7 +28,7 @@ class WP_Job_Manager_Indeed_Import extends WP_Job_Manager_Importer {
 	 */
 	public function wp_enqueue_scripts() {
 		wp_enqueue_script( 'indeed-click-tracking' );
-		wp_enqueue_style( 'job-manager-indeed', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/css/frontend.css' );
+		wp_enqueue_style( 'job-manager-indeed' );
 	}
 
 	/**

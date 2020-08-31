@@ -1,7 +1,8 @@
 === Indeed Integration ===
 Contributors: mikejolley
-Requires at least: 4.7
-Tested up to: 5.2
+Requires at least: 5.0
+Tested up to: 5.5
+Requires PHP: 7.0
 Stable tag: 2.2.1
 License: GNU General Public License v3.0
 

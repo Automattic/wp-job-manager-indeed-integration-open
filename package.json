@@ -1,41 +1,42 @@
 {
   "name": "wp-job-manager-indeed-integration",
-  "title": "WP Job Manager - Indeed Integration",
   "version": "2.2.1",
-  "homepage": "http://wordpress.org/plugins/wp-job-manager/",
-  "license": "GPL-2.0+",
-  "devDependencies": {
-    "grunt": "~1.0.1",
-    "grunt-checkbranch": "^1.0.4",
-    "grunt-checktextdomain": "~1.0.0",
-    "grunt-contrib-clean": "^1.1.0",
-    "grunt-contrib-concat": "1.0.1",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "~2.2.0",
-    "grunt-contrib-jshint": "~1.1.0",
-    "grunt-contrib-less": "~1.4.0",
-    "grunt-contrib-sass": "~1.0.0",
-    "grunt-contrib-uglify": "~3.0.0",
-    "grunt-contrib-watch": "~1.0.0",
-    "grunt-gitinfo": "^0.1.8",
-    "grunt-phpcs": "^0.4.0",
-    "grunt-phpunit": "^0.3.6",
-    "grunt-postcss": "^0.8.0",
-    "grunt-rtlcss": "2.0.1",
-    "grunt-shell": "^2.1.0",
-    "grunt-stylelint": "^0.6.0",
-    "grunt-wp-i18n": "~1.0.0",
-    "grunt-wp-readme-to-markdown": "^2.0.0",
-    "grunt-zip": "^0.17.1"
+  "description": "WP Job Manager - Indeed Integration",
+  "author": "Automattic",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "wordpress-plugin"
+  ],
+  "homepage": "https://wpjobmanager.com/add-ons/indeed-integration/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Automattic/wp-job-manager-indeed-integration.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Automattic/wp-job-manager-indeed-integration/issues"
   },
   "engines": {
     "node": ">=6.10.2"
   },
+  "devDependencies": {
+    "@wordpress/scripts": "12.1.1"
+  },
   "scripts": {
-    "distclean": "rm -rf node_modules && yarn cache clean && rm -rf tmp",
-    "build": "grunt build",
-    "watch": "grunt watch",
-    "package": "grunt package",
-    "test": "grunt test"
+    "build": "npm run build:assets && npm run archive",
+    "build:assets": "wp-scripts build",
+    "archive": "composer archive --file=$npm_package_name --format=zip",
+    "postarchive": "rm -rf $npm_package_name && unzip $npm_package_name.zip -d $npm_package_name && rm $npm_package_name.zip && zip -r $npm_package_name.zip $npm_package_name && rm -rf $npm_package_name",
+    "check-engines": "wp-scripts check-engines",
+    "check-licenses": "wp-scripts check-licenses",
+    "format:js": "wp-scripts format-js",
+    "lint:css": "wp-scripts lint-style assets/css",
+    "lint:js": "wp-scripts lint-js assets/js",
+    "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "packages-update": "wp-scripts packages-update",
+    "start": "wp-scripts start",
+    "test": "npm run test-php",
+    "test-php": "./vendor/bin/phpunit",
+    "i18n:build": "npm run i18n:php",
+    "i18n:php": "wp i18n make-pot --exclude=lib,build,vendor,node_modules --skip-js --headers='{\"Last-Translator\":null,\"Language-Team\":null,\"Report-Msgid-Bugs-To\":\"https://wpjobmanager.com/support/\"}' . languages/wp-job-manager-indeed-integration.pot"
   }
 }
