@@ -1,6 +1,5 @@
 /nbproject/private/
 /node_modules/
-package-lock.json
 project.xml
 project.properties
 .DS_Store
@@ -12,3 +11,5 @@ sftp-config.json
 /vendor/
 /tmp/
 *.log
+/*.zip
+/assets/dist

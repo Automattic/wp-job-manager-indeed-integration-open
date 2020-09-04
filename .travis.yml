@@ -37,24 +37,22 @@ matrix:
   include:
     #    - php: "7.2"
     #      env: WP_TRAVISCI="phpcs"
-    - php: "5.6"
-      env: WP_VERSION=latest WPJM_VERSION=latest
-    - php: "5.6"
-      env: WP_VERSION=master WPJM_VERSION=latest
-    - php: "5.6"
-      env: WP_VERSION=previous WPJM_VERSION=latest
     - php: "7.0"
       env: WP_VERSION=latest WPJM_VERSION=latest
     - php: "7.1"
       env: WP_VERSION=latest WPJM_VERSION=latest
     - php: "7.2"
       env: WP_VERSION=latest WPJM_VERSION=latest
-    - php: "7.2"
+    - php: "7.3"
       env: WP_VERSION=latest WPJM_VERSION=previous
-    - php: "7.2"
+    - php: "7.3"
       env: WP_VERSION=latest WPJM_VERSION=master
     - php: "7.3"
       env: WP_VERSION=latest WPJM_VERSION=latest
+    - php: "7.4"
+      env: WP_VERSION=latest WPJM_VERSION=latest
+    - php: "7.3"
+      env: WP_VERSION=latest WPJM_VERSION=latest DISABLE_TRASH=1 PHPUNIT_GROUP=run_with_trash_disabled
 
 # Clones WordPress and configures our testing environment.
 before_script:

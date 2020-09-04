@@ -6,12 +6,13 @@
  * Version: 2.2.1
  * Author: Automattic
  * Author URI: https://wpjobmanager.com
- * Requires at least: 4.7
- * Tested up to: 5.2
+ * Requires at least: 5.0
+ * Tested up to: 5.5
+ * Requires PHP: 7.0
  *
  * WPJM-Product: wp-job-manager-indeed-integration
  *
- * Copyright: 2019 Automattic
+ * Copyright: 2020 Automattic
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -130,6 +131,10 @@ class WP_Job_Manager_Indeed_Integration {
 	 */
 	public function wp_enqueue_scripts() {
 		wp_register_script( 'indeed-click-tracking', '//gdc.indeed.com/ads/apiresults.js', array(), JOB_MANAGER_INDEED_VERSION, true );
+		wp_register_script( 'wp-job-manager-indeed-jobs', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/dist/js/indeed-jobs.js', array( 'jquery', 'wp-job-manager-ajax-filters', 'indeed-click-tracking' ), JOB_MANAGER_INDEED_VERSION, true );
+		wp_localize_script( 'wp-job-manager-indeed-jobs', 'job_manager_indeed_jobs', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+
+		wp_register_style( 'job-manager-indeed', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/dist/css/frontend.css', array(), JOB_MANAGER_INDEED_VERSION, true );
 	}
 
 	/**

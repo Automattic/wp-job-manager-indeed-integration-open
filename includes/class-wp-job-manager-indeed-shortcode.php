@@ -23,9 +23,8 @@ class WP_Job_Manager_Indeed_Shortcode {
 	 * Enqueue scripts
 	 */
 	public function wp_enqueue_scripts() {
-		wp_enqueue_style( 'job-manager-indeed', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/css/frontend.css' );
-		wp_register_script( 'wp-job-manager-indeed-jobs', JOB_MANAGER_INDEED_PLUGIN_URL . '/assets/js/indeed-jobs.js', array( 'jquery', 'wp-job-manager-ajax-filters', 'indeed-click-tracking' ), JOB_MANAGER_INDEED_VERSION, true );
-		wp_localize_script( 'wp-job-manager-indeed-jobs', 'job_manager_indeed_jobs', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		wp_enqueue_style( 'job-manager-indeed' );
+		wp_enqueue_script( 'wp-job-manager-indeed-jobs' );
 	}
 
 	/**
