@@ -32,6 +32,14 @@ To install this plugin, please refer to the guide here: [http://codex.wordpress.
 
 == Changelog ==
 
+= 2.2.2 =
+* Check for geocoding errors before using data.
+* Add a few missing strings to pot file.
+* Load frontend styles on Indeed shortcode page.
+* Change to import jobs by date by default.
+* Fix Indeed job feed template folder override location.
+* Add "expirydate" to job feed.
+
 = 2.2.1 =
 * Fix issue with geocoding errors preventing job listing results from loading.
 
