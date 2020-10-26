@@ -3,7 +3,7 @@ Contributors: mikejolley
 Requires at least: 5.0
 Tested up to: 5.5
 Requires PHP: 7.0
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GNU General Public License v3.0
 
 Query and show sponsored results from Indeed when listing jobs, list Indeed jobs via a shortcode, and export your job listings to Indeed via XML. Note: Indeed jobs will be displayed in list format linking offsite (without full descriptions).
@@ -31,6 +31,14 @@ If you need help with customisation you will need to find and hire a developer c
 To install this plugin, please refer to the guide here: [http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation)
 
 == Changelog ==
+
+= 2.2.2 =
+* Check for geocoding errors before using data.
+* Add a few missing strings to pot file.
+* Load frontend styles on Indeed shortcode page.
+* Change to import jobs by date by default.
+* Fix Indeed job feed template folder override location.
+* Add "expirydate" to job feed.
 
 = 2.2.1 =
 * Fix issue with geocoding errors preventing job listing results from loading.
