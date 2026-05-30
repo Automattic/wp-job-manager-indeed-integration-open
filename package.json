@@ -21,6 +21,11 @@
   "devDependencies": {
     "@wordpress/scripts": "12.2.1"
   },
+  "overrides": {
+    "ejs": "3.1.10",
+    "elliptic": "6.6.1",
+    "form-data": "2.5.5"
+  },
   "scripts": {
     "build": "npm run build:assets && npm run archive",
     "build:assets": "wp-scripts build",
